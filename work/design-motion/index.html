@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design & Motion | Piyush Kumar</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+<link rel="stylesheet" href="../work.css">
+<style>
+.work-hero {
+  padding: 130px 24px 20px;
+  text-align: center;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(124,92,255,.18), transparent 45%),
+    radial-gradient(circle at 70% 60%, rgba(0,229,255,.1), transparent 40%);
+}
+.pulse-bar {
+  height: 3px; width: min(180px, 40%); margin: 0 auto 32px; border-radius: 99px;
+  background: linear-gradient(90deg, #7C5CFF, #00E5FF, #7C5CFF); background-size: 200% 100%;
+  animation: shine 3s linear infinite;
+}
+@keyframes shine { 0% { background-position: 0%; } 100% { background-position: 200%; } }
+
+.motion-strip {
+  width: min(1200px, calc(100% - 28px));
+  margin: 0 auto 40px;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 12px;
+}
+.motion-card {
+  position: relative; border-radius: 18px; overflow: hidden;
+  height: 210px; border: 1px solid rgba(255,255,255,.07);
+}
+.motion-card img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform .6s cubic-bezier(.2,.8,.2,1);
+}
+.motion-card:hover img { transform: scale(1.07); }
+.motion-card .label {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 32px 16px 14px;
+  background: linear-gradient(to top, rgba(0,0,0,.78), transparent);
+  font-size: 13px; font-weight: 600; letter-spacing: .3px;
+}
+
+.studio-grid {
+  width: min(1200px, calc(100% - 28px));
+  margin: 0 auto 90px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 18px;
+}
+.studio-card {
+  border-radius: 18px; overflow: hidden;
+  background: rgba(255,255,255,.035);
+  border: 1px solid rgba(255,255,255,.08);
+  transition: transform .35s, border-color .3s, box-shadow .35s;
+  animation: rise .5s ease both;
+}
+.studio-card:hover {
+  transform: translateY(-7px);
+  border-color: rgba(0,229,255,.35);
+  box-shadow: 0 22px 48px rgba(0,0,0,.4);
+}
+.studio-media {
+  position: relative; height: 150px; overflow: hidden;
+  background: linear-gradient(135deg, #15102a, #0a1e2e);
+}
+.studio-media img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform .55s cubic-bezier(.2,.8,.2,1);
+  opacity: .88;
+}
+.studio-card:hover .studio-media img { transform: scale(1.1); opacity: 1; }
+.studio-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(5,8,22,.8), transparent 55%);
+  pointer-events: none;
+}
+.studio-body { padding: 16px 18px 20px; }
+.studio-icon {
+  font-size: 26px; margin-bottom: 8px;
+  display: inline-block; animation: float 4s ease-in-out infinite;
+}
+.studio-card:nth-child(2n) .studio-icon { animation-delay: -1s; }
+.studio-card:nth-child(3n) .studio-icon { animation-delay: -2s; }
+.studio-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 5px; }
+.studio-card p { font-size: 12.5px; color: rgba(255,255,255,.48); margin-bottom: 10px; line-height: 1.45; }
+.studio-tag {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.4px;
+  text-transform: uppercase; color: #00E5FF;
+}
+@keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+@media (max-width: 800px) {
+  .motion-strip { grid-template-columns: 1fr; }
+  .motion-card { height: 170px; }
+}
+</style>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/responsive.css">
+</head>
+<body>
+<header id="header" role="banner">
+        <div class="nav-wrapper">
+            <a href="../../index.html" class="logo">
+            <div class="logo-circle">PK</div>
+            <div class="logo-text">
+                <h3>Piyush Kumar</h3>
+                <span>Creative Developer</span>
+            </div>
+            </a>
+        <nav class="desktop-nav" aria-label="Primary Navigation">
+            <ul>
+                <li><a href="../../index.html">Home</a></li>
+                <li><a href="../../index.html#services">Skills</a></li>
+                <li><a href="../../index.html#projects">Projects</a></li>
+                <li><a href="../../work/cinematic/index.html">Gallery</a></li>
+                <li><a href="../../about/index.html">About</a></li>
+                <li><a href="../../contact/index.html">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="nav-right">
+            <button id="menuBtn" aria-label="Open Menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </div>
+</header>
+    <div class="menu-overlay"></div>
+<div class="mobile-menu">
+    <div class="menu-close">
+        <i class="fa-solid fa-xmark"></i>
+    </div>
+    <ul>
+    <li><a href="../../index.html">Home</a></li>
+    <li><a href="../../index.html#services">Skills</a></li>
+    <li><a href="../../index.html#projects">Projects</a></li>
+    <li><a href="../../work/cinematic/index.html">Gallery</a></li>
+    <li><a href="../../about/index.html">About</a></li>
+    <li><a href="../../contact/index.html">Contact</a></li>
+    </ul>
+    <div class="menu-social">
+        <a href="https://www.instagram.com/aadii_zy?igsh=MWtsdTlwMHU5djlwaA==" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+        <a href="https://github.com/kumarpiyush8299-crypto" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i></a>
+        <a href="https://www.linkedin.com/in/piyush-kumar-833489412" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin"></i></a>
+        <a href="https://wa.me/919234183198" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp"></i></a>
+    </div>
+</div>
+
+<section class="work-hero">
+  <span>DESIGN & MOTION</span>
+  <h1>Studios & Disciplines</h1>
+  <p>Brand, UI/UX, motion, 3D and interaction — each studio with its own visual frame.</p>
+</section>
+<div class="pulse-bar"></div>
+<div class="back-bar"><a href="../../index.html"><i class="fa-solid fa-arrow-left"></i> Back to Home</a></div>
+
+<div class="motion-strip">
+  <div class="motion-card">
+    <img src="../../images/uiux/webapp.jpg" loading="lazy" alt="">
+    <div class="label">3D · Motion · Product</div>
+  </div>
+  <div class="motion-card">
+    <img src="../../images/uiux/mobile.jpg" loading="lazy" alt="">
+    <div class="label">UI · Dashboard</div>
+  </div>
+  <div class="motion-card">
+    <img src="../photography/images/p13.jpg" loading="lazy" alt="">
+    <div class="label">Brand · Identity</div>
+  </div>
+</div>
+
+<div class="studio-grid">
+<div class="studio-card" style="animation-delay:0.0s">
+  <div class="studio-media"><img src="../../images/uiux/webapp.jpg" loading="lazy" alt=""><div class="studio-overlay"></div></div>
+  <div class="studio-body">
+    <div class="studio-icon">🎨</div>
+    <h3>Brand Identity Studio</h3>
+    <p>logo, brand guidelines, colors, typography</p>
+    <span class="studio-tag">Studio 01</span>
+  </div>
+</div><div class="studio-card" style="animation-delay:0.03s">
+  <div class="studio-media"><img src="../../images/uiux/mobile.jpg" loading="lazy" alt=""><div class="studio-overlay"></div></div>
+  <div class="studio-body">
+    <div class="studio-icon">📱</div>
+    <h3>UI/UX Design Studio</h3>
+    <p>web & app interface</p>
+    <span class="studio-tag">Studio 02</span>
+  </div>
+</div><div class="studio-card" style="animation-delay:0.06s">
+  <div class="studio-media"><img src="../photography/images/p13.jpg" loading="lazy" alt=""><div class="studio-overlay"></div></div>
+  <div class="studio-body">
+    <div class="studio-icon">🎬</div>
+    <h3>Motion Graphics Studio</h3>
+    <p>animated graphics & promo videos</p>
+    <span class="studio-tag">Studio 03</span>
+  </div>
+</div><div class="studio-card" style="animation-delay:0.09s">
+  <div class="studio-media"><img src="../graphics/images/g17.jpg" loading="lazy" alt=""><div class="studio-overlay"></div></div>
+  <div class="studio-body">
+    <div class="studio-icon">🧊</div>
+    <h3>3D Design Studio</h3>
+    <p>3D objects, scenes & renders</p>
+    <span class="studio-tag">Studio 04</span>
+  </div>
+</div><div class="studio-card" style="animation-delay:0.12s">
+  <div class="studio-media"><img src="../../images/websites/website4.jpg" loading="lazy" alt=""><div class="studio-overlay"></div></div>
+  <div class="studio-body">
+    <div class="studio-icon">🖼️</div>
+    <h3>Creative Poster Studio</h3>
+    <p>posters, campaigns & artwork</p>
+    <span class="studio-tag">Studio 05</span>
+  </div>
+</div><div class="studio-card" style="animation-delay:0.15s">
+  <div class="studio-media"><img src="../photography/images/p15.jpg" loading="lazy" alt=""><div class="studio-overlay"></div></div>
+  <div class="studio-body">
+    <div class="studio-icon">📲</div>
+    <h3>Social Media Design</h3>
+    <p>Instagram posts, stories & campaigns</p>
+    <span class="studio-tag">Studio 06</span>
+  </div>
+</div><div class="studio-card" style="animation-delay:0.18s">
+  <div class="studio-media"><img src="../graphics/images/g14.jpg" loading="lazy" alt=""><div class="studio-overlay"></div></div>
+  <div class="studio-body">
+    <div class="studio-icon">📦</div>
+    <h3>Product Design</h3>
+    <p>app/product interface + UX</p>
+    <span class="studio-tag">Studio 07</span>
+  </div>
+</div><div class="studio-card" style="animation-delay:0.21s">
+  <div class="studio-media"><img src="../../images/uiux/dashboard.jpg" loading="lazy" alt=""><div class="studio-overlay"></div></div>
+  <div class="studio-body">
+    <div class="studio-icon">🖥️</div>
+    <h3>Landing Page Design</h3>
+    <p>premium website UI</p>
+    <span class="studio-tag">Studio 08</span>
+  </div>
+</div><div class="studio-card" style="animation-delay:0.24s">
+  <div class="studio-media"><img src="../graphics/images/g18.jpg" loading="lazy" alt=""><div class="studio-overlay"></div></div>
+  <div class="studio-body">
+    <div class="studio-icon">📱</div>
+    <h3>Mobile App Design</h3>
+    <p>modern Android/iOS UI</p>
+    <span class="studio-tag">Studio 09</span>
+  </div>
+</div><div class="studio-card" style="animation-delay:0.27s">
+  <div class="studio-media"><img src="../uiux/images/u12.jpg" loading="lazy" alt=""><div class="studio-overlay"></div></div>
+  <div class="studio-body">
+    <div class="studio-icon">📊</div>
+    <h3>Dashboard Design</h3>
+    <p>SaaS, analytics & admin dashboards</p>
+    <span class="studio-tag">Studio 10</span>
+  </div>
+</div><div class="studio-card" style="animation-delay:0.3s">
+  <div class="studio-media"><img src="../graphics/images/g13.jpg" loading="lazy" alt=""><div class="studio-overlay"></div></div>
+  <div class="studio-body">
+    <div class="studio-icon">✦</div>
+    <h3>Logo & Identity</h3>
+    <p>logos, icons & visual systems</p>
+    <span class="studio-tag">Studio 11</span>
+  </div>
+</div><div class="studio-card" style="animation-delay:0.32999999999999996s">
+  <div class="studio-media"><img src="../uiux/images/u16.jpg" loading="lazy" alt=""><div class="studio-overlay"></div></div>
+  <div class="studio-body">
+    <div class="studio-icon">📦</div>
+    <h3>Packaging Design</h3>
+    <p>product boxes, bottles & labels</p>
+    <span class="studio-tag">Studio 12</span>
+  </div>
+</div><div class="studio-card" style="animation-delay:0.36s">
+  <div class="studio-media"><img src="../graphics/images/g18.jpg" loading="lazy" alt=""><div class="studio-overlay"></div></div>
+  <div class="studio-body">
+    <div class="studio-icon">🔤</div>
+    <h3>Typography Studio</h3>
+    <p>experimental typography & lettering</p>
+    <span class="studio-tag">Studio 13</span>
+  </div>
+</div><div class="studio-card" style="animation-delay:0.39s">
+  <div class="studio-media"><img src="../photography/images/p19.jpg" loading="lazy" alt=""><div class="studio-overlay"></div></div>
+  <div class="studio-body">
+    <div class="studio-icon">✏️</div>
+    <h3>Illustration Studio</h3>
+    <p>digital illustrations & artwork</p>
+    <span class="studio-tag">Studio 14</span>
+  </div>
+</div><div class="studio-card" style="animation-delay:0.42s">
+  <div class="studio-media"><img src="../graphics/images/g12.jpg" loading="lazy" alt=""><div class="studio-overlay"></div></div>
+  <div class="studio-body">
+    <div class="studio-icon">👾</div>
+    <h3>Character Design</h3>
+    <p>characters + animation concepts</p>
+    <span class="studio-tag">Studio 15</span>
+  </div>
+</div><div class="studio-card" style="animation-delay:0.44999999999999996s">
+  <div class="studio-media"><img src="../uiux/images/u17.jpg" loading="lazy" alt=""><div class="studio-overlay"></div></div>
+  <div class="studio-body">
+    <div class="studio-icon">🌀</div>
+    <h3>3D Motion Design</h3>
+    <p>3D animation & product motion</p>
+    <span class="studio-tag">Studio 16</span>
+  </div>
+</div><div class="studio-card" style="animation-delay:0.48s">
+  <div class="studio-media"><img src="../photography/images/p16.jpg" loading="lazy" alt=""><div class="studio-overlay"></div></div>
+  <div class="studio-body">
+    <div class="studio-icon">🎥</div>
+    <h3>Explainer Animation</h3>
+    <p>animated brand/product explainers</p>
+    <span class="studio-tag">Studio 17</span>
+  </div>
+</div><div class="studio-card" style="animation-delay:0.51s">
+  <div class="studio-media"><img src="../photography/images/p11.jpg" loading="lazy" alt=""><div class="studio-overlay"></div></div>
+  <div class="studio-body">
+    <div class="studio-icon">✨</div>
+    <h3>Micro-Interaction Lab</h3>
+    <p>hover, loading & UI animations</p>
+    <span class="studio-tag">Studio 18</span>
+  </div>
+</div><div class="studio-card" style="animation-delay:0.54s">
+  <div class="studio-media"><img src="../photography/images/p14.jpg" loading="lazy" alt=""><div class="studio-overlay"></div></div>
+  <div class="studio-body">
+    <div class="studio-icon">🥽</div>
+    <h3>AR/Interactive Design</h3>
+    <p>immersive interactive experiences</p>
+    <span class="studio-tag">Studio 19</span>
+  </div>
+</div><div class="studio-card" style="animation-delay:0.57s">
+  <div class="studio-media"><img src="../uiux/images/u13.jpg" loading="lazy" alt=""><div class="studio-overlay"></div></div>
+  <div class="studio-body">
+    <div class="studio-icon">💼</div>
+    <h3>Creative Portfolio</h3>
+    <p>complete designer showcase</p>
+    <span class="studio-tag">Studio 20</span>
+  </div>
+</div>
+</div>
+
+<footer class="work-footer">© 2026 Piyush Kumar · Design & Motion</footer>
+<script src="../../js/script.js"></script>
+</body>
+</html>

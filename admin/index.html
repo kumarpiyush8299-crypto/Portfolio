@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PK Master Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+<style>
+:root{
+  --bg:#060914;--side:#0a0f1c;--card:rgba(255,255,255,.045);--bd:rgba(255,255,255,.1);
+  --p:#7C5CFF;--s:#00E5FF;--ok:#22c55e;--warn:#f59e0b;--danger:#ef4444;--muted:rgba(255,255,255,.5);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:Poppins,sans-serif;background:var(--bg);color:#fff;overflow:hidden;line-height:1.5}
+button,input,textarea,select{font-family:inherit;font-size:13px}
+a{color:var(--s);text-decoration:none}
+
+#loginScreen{height:100%;overflow:auto;display:flex;align-items:center;justify-content:center;padding:24px;
+background:radial-gradient(circle at 20% 20%,rgba(124,92,255,.25),transparent 40%),radial-gradient(circle at 80% 70%,rgba(0,229,255,.12),transparent 40%),var(--bg)}
+.login-box{width:100%;max-width:400px;padding:36px 28px;border-radius:22px;background:rgba(255,255,255,.05);border:1px solid var(--bd);backdrop-filter:blur(20px)}
+.login-box .logo{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,var(--p),var(--s));color:#0a0a12;font-weight:800;margin-bottom:14px}
+.login-box h1{font-size:20px;margin-bottom:4px}.login-box p{font-size:12px;color:var(--muted);margin-bottom:18px}
+.login-box label{display:block;font-size:11px;font-weight:600;margin-bottom:6px}
+.login-box input{width:100%;padding:12px 14px;border-radius:11px;border:1px solid var(--bd);background:rgba(0,0,0,.35);color:#fff;margin-bottom:12px;outline:none}
+.login-box button{width:100%;padding:12px;border:0;border-radius:11px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--p),var(--s));color:#0a0a12}
+.login-err{color:#fca5a5;font-size:12px;display:none;margin-top:8px}
+
+#app{display:none;height:100%}
+.shell{display:grid;grid-template-columns:270px 1fr;height:100vh;overflow:hidden}
+.side{height:100vh;overflow-y:auto;overflow-x:hidden;background:var(--side);border-right:1px solid var(--bd);padding:14px 10px;display:flex;flex-direction:column}
+.side::-webkit-scrollbar{width:5px}.side::-webkit-scrollbar-thumb{background:rgba(124,92,255,.4);border-radius:8px}
+.brand{display:flex;gap:10px;align-items:center;padding:4px 8px 14px;border-bottom:1px solid var(--bd);margin-bottom:10px}
+.brand .mk{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--p),var(--s));display:grid;place-items:center;font-weight:800;color:#0a0a12;font-size:12px}
+.brand strong{display:block;font-size:13px}.brand span{font-size:10px;color:var(--muted)}
+.ng{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,.32);padding:10px 10px 4px}
+.nb{width:100%;text-align:left;padding:9px 11px;border:0;border-radius:9px;background:transparent;color:rgba(255,255,255,.62);font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:9px;margin-bottom:2px;transition:.2s}
+.nb i{width:16px;text-align:center;font-size:12px}.nb:hover{background:rgba(124,92,255,.12);color:#fff;transform:translateX(2px)}
+.nb.active{background:rgba(124,92,255,.2);color:#fff}
+.side .foot{margin-top:auto;padding-top:10px;border-top:1px solid var(--bd)}
+
+.content{height:100vh;overflow:hidden;display:flex;flex-direction:column}
+.top{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 16px;background:rgba(6,9,20,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--bd);flex-wrap:wrap;z-index:20}
+.top h1{font-size:14px;font-weight:700}
+.pill{display:inline-flex;padding:2px 9px;border-radius:999px;font-size:10px;font-weight:600;margin-left:6px}
+.pill.d{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.35)}
+.pill.l{background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.35)}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 11px;border-radius:9px;border:1px solid var(--bd);background:rgba(255,255,255,.06);color:#fff;font-size:11px;font-weight:600;cursor:pointer;transition:.2s}
+.btn:hover{border-color:var(--s);color:var(--s)}.btn.primary{background:linear-gradient(135deg,var(--p),var(--s));color:#0a0a12;border:0}
+.btn.ok{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.4);color:#86efac}
+.btn.ai{background:rgba(124,92,255,.18);border-color:rgba(124,92,255,.4);color:#c4b5fd}
+.btn.danger{border-color:rgba(239,68,68,.4);color:#fca5a5}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+.main{flex:1;overflow-y:auto;overflow-x:hidden;padding:18px 16px 60px}
+.main::-webkit-scrollbar{width:7px}.main::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:8px}
+.panel{display:none;animation:in .3s ease}
+.panel.active{display:block}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.panel h2{font-size:17px;margin-bottom:3px}
+.hint{font-size:11px;color:var(--muted);margin-bottom:14px}
+
+.dg{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+.dc{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;transition:.25s}
+.dc:hover{transform:translateY(-2px);border-color:rgba(124,92,255,.35)}
+.dc .lb{font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.dc .vl{font-size:20px;font-weight:800;color:var(--s);margin-top:4px}
+
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:11px;transition:.25s}
+.card:hover{border-color:rgba(124,92,255,.28)}
+.card h3{font-size:12px;color:var(--s);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.field{margin-bottom:10px}
+.field label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:4px}
+.field input,.field textarea,.field select{width:100%;padding:9px 11px;border-radius:9px;border:1px solid var(--bd);background:rgba(0,0,0,.32);color:#fff;outline:none}
+.field textarea{min-height:68px;resize:vertical}
+.field input:focus,.field textarea:focus{border-color:var(--p)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+.li{display:grid;grid-template-columns:48px 1fr 1fr auto;gap:8px;align-items:start;padding:10px;border-radius:11px;background:rgba(0,0,0,.22);border:1px solid var(--bd);margin-bottom:7px}
+.li .full{grid-column:2/-2}
+.ip{width:44px;height:44px;border-radius:11px;border:1px solid var(--bd);background:rgba(124,92,255,.12);color:var(--s);display:grid;place-items:center;cursor:pointer;font-size:16px}
+.rm{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;border-radius:8px;padding:7px 9px;cursor:pointer}
+
+.ig{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:5px;max-height:160px;overflow:auto;padding:8px;background:rgba(0,0,0,.25);border-radius:10px}
+.ig button{width:40px;height:40px;border-radius:9px;border:1px solid var(--bd);background:rgba(255,255,255,.04);color:#fff;cursor:pointer}
+.ig button:hover{border-color:var(--s);color:var(--s)}
+
+.g-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:9px}
+.g-item{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:1;background:#111;border:2px solid transparent;cursor:pointer;transition:.2s}
+.g-item.selected{border-color:var(--s);box-shadow:0 0 0 2px rgba(0,229,255,.3)}
+.g-item img,.g-item video{width:100%;height:100%;object-fit:cover}
+.g-item .tick{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--s));color:#0a0a12;display:none;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+.g-item.selected .tick{display:flex}
+.g-item .cap{position:absolute;bottom:0;left:0;right:0;padding:5px;font-size:9px;background:linear-gradient(transparent,rgba(0,0,0,.85));color:rgba(255,255,255,.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-item .unsel{position:absolute;top:6px;left:6px;display:none;padding:3px 7px;border-radius:6px;font-size:9px;font-weight:700;background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.25);color:#fff}
+.g-item.selected .unsel{display:block}
+
+.voice{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:11px;border-radius:12px;margin-bottom:12px;background:linear-gradient(135deg,rgba(124,92,255,.14),rgba(0,229,255,.07));border:1px solid rgba(124,92,255,.3)}
+.voice .mic{width:40px;height:40px;border-radius:50%;border:0;cursor:pointer;background:linear-gradient(135deg,var(--p),var(--s));color:#0a0a12;font-size:15px}
+.voice .mic.on{animation:pulse 1s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 12px transparent}}
+.voice input{flex:1;min-width:160px;padding:9px 11px;border-radius:9px;border:1px solid var(--bd);background:rgba(0,0,0,.3);color:#fff}
+
+.toast{position:fixed;bottom:18px;right:18px;padding:11px 14px;border-radius:11px;font-size:12px;font-weight:600;background:#111827;border:1px solid var(--ok);color:#86efac;opacity:0;transform:translateY(10px);transition:.3s;z-index:99}
+.toast.show{opacity:1;transform:none}
+
+@media(max-width:900px){
+  body{overflow:auto}
+  .shell{grid-template-columns:1fr;height:auto;overflow:visible}
+  .side{height:auto;max-height:none;overflow-x:auto;overflow-y:hidden;flex-direction:row;border-right:0;border-bottom:1px solid var(--bd)}
+  .side .brand,.side .foot,.ng{display:none}
+  .nb{white-space:nowrap;width:auto}
+  .content{height:auto;overflow:visible}
+  .main{overflow:visible}
+  .row,.row3,.li{grid-template-columns:1fr}
+  .li .full{grid-column:1}
+}
+
+.field-row{display:flex;gap:8px;align-items:flex-end}
+.field-row .field{flex:1;margin-bottom:0}
+.field-row .up-btn{flex-shrink:0;margin-bottom:0;height:38px;padding:0 12px;border-radius:9px;border:1px solid var(--bd);
+background:rgba(0,229,255,.12);color:var(--s);font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.field-row .up-btn:hover{border-color:var(--s);background:rgba(0,229,255,.2)}
+.field-row input[type=file]{display:none}
+.preview-thumb{width:56px;height:56px;border-radius:10px;object-fit:cover;border:1px solid var(--bd);background:#111}
+
+</style>
+</head>
+<body>
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="logo">PK</div>
+    <h1>Master Dashboard</h1>
+    <p>Website pages ke hisaab se control — draft → preview → publish.</p>
+    <label>Password</label>
+    <input type="password" id="pin" placeholder="Admin password" autocomplete="current-password">
+    <button type="button" id="loginBtn"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+    <div class="login-err" id="loginErr">Wrong password</div>
+  </div>
+</div>
+
+<div id="app">
+<div class="shell">
+<aside class="side">
+  <div class="brand"><div class="mk">PK</div><div><strong>PK Admin</strong><span>Full site CMS</span></div></div>
+  <div class="ng">Overview</div>
+  <button class="nb active" data-p="dash"><i class="fa-solid fa-gauge-high"></i> Dashboard</button>
+  <button class="nb" data-p="ai"><i class="fa-solid fa-robot"></i> AI Assist + Voice</button>
+  <div class="ng">01 · Main page</div>
+  <button class="nb" data-p="hero"><i class="fa-solid fa-id-card"></i> Profile / Hero</button>
+  <button class="nb" data-p="skills"><i class="fa-solid fa-layer-group"></i> Skills + Icons</button>
+  <button class="nb" data-p="projects"><i class="fa-solid fa-briefcase"></i> Creative Work</button>
+  <button class="nb" data-p="media"><i class="fa-solid fa-video"></i> Showreel</button>
+  <button class="nb" data-p="travel"><i class="fa-solid fa-earth-asia"></i> Explore World</button>
+  <button class="nb" data-p="tools"><i class="fa-solid fa-wrench"></i> Tools + Icons</button>
+  <button class="nb" data-p="timeline"><i class="fa-solid fa-timeline"></i> Timeline</button>
+  <button class="nb" data-p="highlights"><i class="fa-solid fa-trophy"></i> Highlights</button>
+  <button class="nb" data-p="cta"><i class="fa-solid fa-bullhorn"></i> CTA</button>
+  <button class="nb" data-p="testimonials"><i class="fa-solid fa-quote-left"></i> Testimonials</button>
+  <button class="nb" data-p="footer"><i class="fa-solid fa-shoe-prints"></i> Footer</button>
+  <div class="ng">02 · Connected pages</div>
+  <button class="nb" data-p="websites"><i class="fa-solid fa-globe"></i> 20 Websites</button>
+  <button class="nb" data-p="gallery"><i class="fa-solid fa-images"></i> Gallery media</button>
+  <button class="nb" data-p="design"><i class="fa-solid fa-pen-ruler"></i> Design / UI-UX</button>
+  <div class="ng">03 · About · Contact</div>
+  <button class="nb" data-p="about"><i class="fa-solid fa-user"></i> About + Resume</button>
+  <button class="nb" data-p="contact"><i class="fa-solid fa-envelope"></i> Contact page</button>
+  <button class="nb" data-p="social"><i class="fa-solid fa-share-nodes"></i> Social links</button>
+  <div class="ng">System</div>
+  <button class="nb" data-p="security"><i class="fa-solid fa-key"></i> Security</button>
+  <div class="foot"><button class="nb" id="btnLogout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button></div>
+</aside>
+
+<div class="content">
+<header class="top">
+  <h1>Dashboard <span class="pill d" id="statusPill">Draft</span></h1>
+  <div class="actions">
+    <button class="btn ai" id="btnAI"><i class="fa-solid fa-wand-magic-sparkles"></i> AI fix</button>
+    <button class="btn" id="btnPreview"><i class="fa-solid fa-eye"></i> Preview</button>
+    <button class="btn" id="btnSave"><i class="fa-solid fa-floppy-disk"></i> Save draft</button>
+    <button class="btn ok" id="btnPublish"><i class="fa-solid fa-globe"></i> Publish</button>
+    <button class="btn" id="btnExport"><i class="fa-solid fa-download"></i> Export</button>
+    <button class="btn" id="btnImport"><i class="fa-solid fa-upload"></i> Import</button>
+    <input type="file" id="importFile" accept=".json,application/json" hidden>
+  </div>
+</header>
+<main class="main" id="mainScroll">
+
+<!-- DASH -->
+<section class="panel active" id="p-dash">
+  <h2>Dashboard</h2>
+  <p class="hint">Site structure ke hisaab se sections. Pehle draft save → Preview → Publish.</p>
+  <div class="dg">
+    <div class="dc"><div class="lb">Skills</div><div class="vl" id="stSk">0</div></div>
+    <div class="dc"><div class="lb">Tools</div><div class="vl" id="stTl">0</div></div>
+    <div class="dc"><div class="lb">Websites</div><div class="vl" id="stWeb">0</div></div>
+    <div class="dc"><div class="lb">Gallery</div><div class="vl" id="stGal">0</div></div>
+    <div class="dc"><div class="lb">Status</div><div class="vl" id="stSt" style="font-size:14px">Draft</div></div>
+  </div>
+  <div class="card"><h3><i class="fa-solid fa-sitemap"></i> Map</h3>
+  <p style="font-size:11px;color:var(--muted);line-height:1.75">Main: Profile, Skills, Creative Work, Showreel, Travel, Tools, Timeline, Highlights, CTA, Testimonials, Footer<br>
+  Pages: 20 Websites · Gallery · Design/UI-UX · About+Resume · Contact · Social</p></div>
+</section>
+
+<!-- AI -->
+<section class="panel" id="p-ai">
+  <h2>AI Assist + Voice</h2>
+  <p class="hint">Hinglish / English / India style — type ya mic.</p>
+  <div class="voice">
+    <button type="button" class="mic" id="btnMic"><i class="fa-solid fa-microphone"></i></button>
+    <input id="voiceCmd" placeholder="name Piyush · bio ... · add skill Web Design · publish">
+    <button type="button" class="btn ai" id="btnRunCmd">Run</button>
+  </div>
+  <div class="card" id="aiReport"><p class="hint" style="margin:0">AI report yahan aayega.</p></div>
+  <button type="button" class="btn ai" id="btnAI2"><i class="fa-solid fa-robot"></i> Scan &amp; auto-fix</button>
+</section>
+
+<!-- HERO -->
+<section class="panel" id="p-hero">
+  <h2>Profile / Hero (Main)</h2>
+  <div class="card">
+    <div class="row">
+      <div class="field"><label>Name</label><input id="heroName"></div>
+      <div class="field"><label>Role</label><input id="heroRole"></div>
+    </div>
+    <div class="field"><label>Headline</label><input id="heroHeadline"></div>
+    <div class="field"><label>Bio line</label><textarea id="heroBio"></textarea></div>
+    <div class="field"><label>Passionate / extra line (main page)</label><textarea id="heroPassion" placeholder="I am passionate about creating..."></textarea></div>
+    <div class="field-row" style="margin-bottom:10px">
+      <div class="field"><label>Profile photo path / URL</label><input id="heroPhoto" placeholder="images/profile.jpg"></div>
+      <button type="button" class="up-btn" data-upload="heroPhoto" data-accept="image/*"><i class="fa-solid fa-upload"></i> Upload</button>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section class="panel" id="p-skills">
+  <h2>Skills + Icons</h2>
+  <div class="card">
+    <div class="field"><label>Section title</label><input id="skillsTitle" placeholder="What I Can Do"></div>
+    <div class="field"><label>Section intro / passionate line</label><textarea id="skillsIntro" placeholder="Creative digital solutions..."></textarea></div>
+  </div>
+  <div id="skillsList"></div>
+  <button type="button" class="btn" id="addSkill"><i class="fa-solid fa-plus"></i> Add skill</button>
+  <div class="card" style="margin-top:10px"><h3>Icon picker</h3><div class="ig" id="iconGrid"></div></div>
+</section>
+
+<!-- PROJECTS -->
+<section class="panel" id="p-projects">
+  <h2>Creative Work (Main links)</h2>
+  <div class="card">
+    <div class="field"><label>Section title</label><input id="pjTitle" placeholder="My Creative Work"></div>
+    <div class="field"><label>Section line / passionate</label><textarea id="pjIntro"></textarea></div>
+  </div>
+  <div id="projectsList"></div>
+</section>
+
+<!-- MEDIA -->
+<section class="panel" id="p-media">
+  <h2>Showreel</h2>
+  <div class="card">
+    <div class="field-row" style="margin-bottom:10px">
+      <div class="field"><label>Video path / URL</label><input id="mediaShowreel"></div>
+      <button type="button" class="up-btn" data-upload="mediaShowreel" data-accept="video/*"><i class="fa-solid fa-upload"></i> Upload</button>
+    </div>
+    <div class="field-row" style="margin-bottom:10px">
+      <div class="field"><label>Poster image</label><input id="mediaPoster"></div>
+      <button type="button" class="up-btn" data-upload="mediaPoster" data-accept="image/*"><i class="fa-solid fa-upload"></i> Upload</button>
+    </div>
+    <div class="field"><label>Title</label><input id="mediaTitle"></div>
+    <div class="field"><label>Subtitle</label><textarea id="mediaLine"></textarea></div>
+  </div>
+</section>
+
+<!-- TRAVEL -->
+<section class="panel" id="p-travel">
+  <h2>Explore The World</h2>
+  <div class="card">
+    <div class="field"><label>Title</label><input id="travelTitle"></div>
+    <div class="field"><label>Line</label><textarea id="travelLine"></textarea></div>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<section class="panel" id="p-tools">
+  <h2>Tools + Icons</h2>
+  <div class="card">
+    <div class="field"><label>Section title</label><input id="toolsTitle" placeholder="Creative Software"></div>
+    <div class="field"><label>Section line</label><textarea id="toolsIntro"></textarea></div>
+  </div>
+  <div id="toolsList"></div>
+  <button type="button" class="btn" id="addTool"><i class="fa-solid fa-plus"></i> Add tool</button>
+</section>
+
+<!-- TIMELINE -->
+<section class="panel" id="p-timeline">
+  <h2>Timeline</h2>
+  <div class="card">
+    <div class="field"><label>Section title</label><input id="tmTitle" placeholder="Experience Timeline"></div>
+    <div class="field"><label>Section line</label><textarea id="tmIntro"></textarea></div>
+  </div>
+  <div id="timelineList"></div>
+  <button type="button" class="btn" id="addTimeline"><i class="fa-solid fa-plus"></i> Add</button>
+</section>
+
+<!-- HIGHLIGHTS -->
+<section class="panel" id="p-highlights">
+  <h2>Highlights</h2>
+  <div class="card">
+    <div class="field"><label>Section title</label><input id="hiTitle" placeholder="Highlights"></div>
+    <div class="field"><label>Section line</label><textarea id="hiIntro"></textarea></div>
+  </div>
+  <div id="highlightsList"></div>
+  <button type="button" class="btn" id="addHi"><i class="fa-solid fa-plus"></i> Add</button>
+</section>
+
+<!-- CTA -->
+<section class="panel" id="p-cta">
+  <h2>CTA Banner</h2>
+  <div class="card">
+    <div class="field"><label>Heading</label><input id="ctaTitle"></div>
+    <div class="field"><label>Line</label><textarea id="ctaLine"></textarea></div>
+    <div class="field"><label>Button text</label><input id="ctaBtn"></div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="panel" id="p-testimonials">
+  <h2>Testimonials</h2>
+  <div class="card">
+    <div class="field"><label>Section title</label><input id="tsTitle" placeholder="What People Say"></div>
+    <div class="field"><label>Section line</label><textarea id="tsIntro"></textarea></div>
+  </div>
+  <div id="testimonialsList"></div>
+  <button type="button" class="btn" id="addTs"><i class="fa-solid fa-plus"></i> Add</button>
+</section>
+
+<!-- FOOTER -->
+<section class="panel" id="p-footer">
+  <h2>Footer</h2>
+  <div class="card">
+    <div class="field"><label>Footer copyright line</label><input id="footerCopy"></div>
+    <div class="field"><label>Privacy short</label><input id="footerPrivacy"></div>
+    <div class="field"><label>Terms short</label><input id="footerTerms"></div>
+  </div>
+</section>
+
+<!-- WEBSITES 20 -->
+<section class="panel" id="p-websites">
+  <h2>20 Website demos</h2>
+  <p class="hint">Har demo: tag, title, description, folder path, emoji/icon</p>
+  <div id="websitesList"></div>
+  <button type="button" class="btn" id="addWeb"><i class="fa-solid fa-plus"></i> Add demo card</button>
+</section>
+
+<!-- GALLERY -->
+<section class="panel" id="p-gallery">
+  <h2>Gallery media</h2>
+  <p class="hint">Photo/video upload. Select ke baad tick dikhega. Selected pe Unselect bhi.</p>
+  <div class="actions" style="margin-bottom:10px">
+    <button class="btn primary" id="galUp"><i class="fa-solid fa-upload"></i> Upload</button>
+    <button class="btn" id="galAll"><i class="fa-solid fa-check-double"></i> Select all</button>
+    <button class="btn" id="galNone"><i class="fa-solid fa-xmark"></i> Unselect all</button>
+    <button class="btn danger" id="galDel" disabled><i class="fa-solid fa-trash"></i> Delete</button>
+    <span id="galCnt" style="font-size:11px;color:var(--muted);align-self:center">0 selected</span>
+    <input type="file" id="galFile" accept="image/*,video/*,.jpg,.jpeg,.png,.webp,.gif,.mp4,.webm,.mov,.mkv" multiple hidden>
+  </div>
+  <div class="g-grid" id="galGrid"></div>
+</section>
+
+<!-- GALOCK -->
+<!-- DESIGN -->
+<section class="panel" id="p-design">
+  <h2>Design / UI-UX / Graphics</h2>
+  <p class="hint">work/design-motion, uiux, graphics pages</p>
+  <div class="card">
+    <div class="field"><label>Section title</label><input id="designTitle"></div>
+    <div class="field"><label>Description</label><textarea id="designDesc"></textarea></div>
+    <div class="field"><label>UI/UX page path</label><input id="designUiux" placeholder="work/uiux/index.html"></div>
+    <div class="field"><label>Graphics page path</label><input id="designGfx" placeholder="work/graphics/index.html"></div>
+    <div class="field"><label>Design-motion path</label><input id="designMotion" placeholder="work/design-motion/index.html"></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="panel" id="p-about">
+  <h2>About + Resume</h2>
+  <div class="card">
+    <div class="field"><label>About heading</label><input id="aboutTitle"></div>
+    <div class="field"><label>Hello line</label><input id="aboutHello"></div>
+    <div class="field"><label>About body (full)</label><textarea id="aboutBody" style="min-height:100px"></textarea></div>
+    <div class="field"><label>Passionate line (I am passionate about…)</label><textarea id="aboutPassion" placeholder="I am passionate about creating beautiful digital experiences..."></textarea></div>
+    <div class="field-row" style="margin-bottom:10px">
+      <div class="field"><label>Resume file path</label><input id="aboutResume" placeholder="assets/resume.pdf"></div>
+      <button type="button" class="up-btn" data-upload="aboutResume" data-accept=".pdf,application/pdf"><i class="fa-solid fa-upload"></i> Upload</button>
+    </div>
+    <div class="field-row" style="margin-bottom:10px">
+      <div class="field"><label>Profile image path</label><input id="aboutPhoto" placeholder="images/profile.jpg"></div>
+      <button type="button" class="up-btn" data-upload="aboutPhoto" data-accept="image/*"><i class="fa-solid fa-upload"></i> Upload</button>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="panel" id="p-contact">
+  <h2>Contact page</h2>
+  <div class="card">
+    <div class="field"><label>Page heading</label><input id="contactTitle" placeholder="Let's Work Together"></div>
+    <div class="field"><label>Subtitle line</label><textarea id="contactLine"></textarea></div>
+    <div class="field"><label>Extra contact note</label><textarea id="contactNote" placeholder="Any extra line on contact page"></textarea></div>
+    <div class="field"><label>WhatsApp link</label><input id="contactWa"></div>
+    <div class="field"><label>Email</label><input id="contactEmail"></div>
+    <div class="field"><label>Phone display</label><input id="contactPhone"></div>
+    <div class="field-row" style="margin-bottom:10px">
+      <div class="field"><label>Resume button link</label><input id="contactResume" placeholder="../assets/resume.pdf"></div>
+      <button type="button" class="up-btn" data-upload="contactResume" data-accept=".pdf,application/pdf"><i class="fa-solid fa-upload"></i> Upload</button>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL -->
+<section class="panel" id="p-social">
+  <h2>Social links (sab pages)</h2>
+  <div class="card">
+    <div class="row">
+      <div class="field"><label>Instagram</label><input id="socIg"></div>
+      <div class="field"><label>GitHub</label><input id="socGh"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>LinkedIn</label><input id="socLi"></div>
+      <div class="field"><label>WhatsApp</label><input id="socWa"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Facebook</label><input id="socFb"></div>
+      <div class="field"><label>X / Twitter</label><input id="socX"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>YouTube</label><input id="socYt"></div>
+      <div class="field"><label>Behance</label><input id="socBe"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Dribbble</label><input id="socDr"></div>
+      <div class="field"><label>TikTok</label><input id="socTt"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Pinterest</label><input id="socPin"></div>
+      <div class="field"><label>Telegram</label><input id="socTg"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECURITY -->
+<section class="panel" id="p-security">
+  <h2>Security</h2>
+  <div class="card">
+    <div class="field"><label>Current password</label><input type="password" id="curPass"></div>
+    <div class="field"><label>New</label><input type="password" id="newPass"></div>
+    <div class="field"><label>Confirm</label><input type="password" id="newPass2"></div>
+    <button class="btn primary" id="btnPass">Update password</button>
+  </div>
+  <div class="card"><button class="btn danger" id="btnReset">Reset all draft</button></div>
+</section>
+
+</main></div></div></div>
+<div class="toast" id="toast">OK</div>
+
+<script>
+const AUTH='pk_admin_auth', PASS='pk_admin_pass', DEF_PASS='8299';
+const GPIN='pk_gallery_pin', DRAFT='pk_cms_draft_v3', LIVE='pk_cms_live_v2';
+const ICONS=['fa-laptop-code','fa-object-group','fa-pen-ruler','fa-camera-retro','fa-clapperboard','fa-wand-magic-sparkles','fa-bezier-curve','fa-earth-asia','fa-code','fa-palette','fa-film','fa-scissors','fa-robot','fa-camera','fa-mobile-screen','fa-paintbrush','fa-video','fa-image','fa-cube','fa-bolt','fa-star','fa-heart','fa-gem','fa-rocket','fa-briefcase','fa-lightbulb','fa-globe','fa-house','fa-car','fa-shirt'];
+let iconTarget=null;
+
+const DEFAULTS={
+  hero:{name:'Piyush Kumar',role:'Creative Developer',headline:'I build premium digital experiences',bio:'Web developer, designer, photographer and filmmaker.',passion:'I am passionate about creating beautiful digital experiences.',photo:'images/profile.jpg'},
+  skills:[
+    {icon:'fa-laptop-code',title:'Website Development',desc:'Modern responsive premium websites.'},
+    {icon:'fa-object-group',title:'UI / UX Design',desc:'User-centered interfaces.'},
+    {icon:'fa-pen-ruler',title:'Graphic Design',desc:'Branding and social creatives.'},
+    {icon:'fa-camera-retro',title:'Photography',desc:'Portraits, travel, lifestyle.'},
+    {icon:'fa-clapperboard',title:'Videography',desc:'Cinematic storytelling.'},
+    {icon:'fa-wand-magic-sparkles',title:'Photo & Video Editing',desc:'Retouching and color grading.'},
+    {icon:'fa-bezier-curve',title:'Animation',desc:'Motion graphics.'},
+    {icon:'fa-earth-asia',title:'Travel',desc:'Travel films and photos.'}
+  ],
+  tools:[
+    {icon:'fa-clapperboard',name:'DaVinci Resolve'},{icon:'fa-palette',name:'Photoshop'},
+    {icon:'fa-camera',name:'Lightroom'},{icon:'fa-scissors',name:'CapCut'},
+    {icon:'fa-code',name:'VS Code'},{icon:'fa-github',name:'GitHub'},
+    {icon:'fa-robot',name:'ChatGPT'},{icon:'fa-pen-nib',name:'Figma'}
+  ],
+  projects:[
+    {tag:'20 Premium Sites',title:'Websites',desc:'Luxury demos and cinematic sites.',link:'work/websites/index.html'},
+    {tag:'Photo · Travel · Film',title:'Cinematic World',desc:'Unified gallery.',link:'work/cinematic/index.html'},
+    {tag:'20 Studios',title:'Design & Motion',desc:'Brand, UI, motion.',link:'work/design-motion/index.html'}
+  ],
+  media:{showreel:'videos/showreel.mp4',poster:'images/showreel/poster.jpg',title:'Watch My Creative Journey',line:'Best work in one reel.'},
+  travel:{title:'Exploring The World',line:'Places, light and stories from the road.'},
+  timeline:[
+    {year:'2023',title:'Photography & Videography',sub:'Lightroom • Premiere',desc:'Travel and cinematic content.'},
+    {year:'2024',title:'UI/UX & Graphics',sub:'Figma • Photoshop',desc:'Branding and interfaces.'},
+    {year:'2025',title:'Web Development',sub:'HTML • CSS • JS',desc:'Responsive websites.'},
+    {year:'2026',title:'Creative Developer',sub:'Freelance',desc:'Premium digital experiences.'}
+  ],
+  highlights:[{value:'50+',label:'Creative Projects'},{value:'20+',label:'Happy Clients'},{value:'8+',label:'Creative Skills'},{value:'100+',label:'Photos Captured'},{value:'30+',label:'Videos Edited'},{value:'100%',label:'Passion'}],
+  cta:{title:'Have a Project in Mind?',line:'Let us build something premium together.',btn:'Start a project'},
+  testimonials:[{name:'Client',role:'Founder',text:'Outstanding creative work.'}],
+  footer:{copy:'© 2026 Piyush Kumar. All Rights Reserved.',privacy:'We respect your privacy.',terms:'Use subject to terms.'},
+  websites:[
+    {tag:'Luxury Real Estate',title:'Aurelia Estates',desc:'Exclusive properties.',path:'demos/luxury-real-estate/index.html',icon:'🏰'},
+    {tag:'Premium Car Dealership',title:'Apex Motors',desc:'Luxury performance cars.',path:'demos/premium-car-dealership/index.html',icon:'🏎️'},
+    {tag:'AI Business Assistant',title:'NovaMind AI',desc:'Enterprise AI assistant.',path:'demos/ai-business-assistant/index.html',icon:'🤖'},
+    {tag:'Luxury Fashion House',title:'ÉLAN Couture',desc:'Couture and RTW.',path:'demos/luxury-fashion-house/index.html',icon:'👗'}
+  ],
+  design:{title:'Design & Motion',desc:'UI/UX, graphics and motion studios.',uiux:'work/uiux/index.html',graphics:'work/graphics/index.html',motion:'work/design-motion/index.html'},
+  about:{title:'Creative Developer & Digital Creator',hello:"Hello, I'm Piyush Kumar 👋",body:'I build modern websites, premium digital experiences, cinematic visuals and creative branding.',passion:'I am passionate about creating beautiful digital experiences.',resume:'assets/resume.pdf',photo:'images/profile.jpg'},
+  contact:{title:"Let's Work Together",line:'Tell me about your project.',wa:'https://wa.me/919234183198',email:'',phone:'',resume:'../assets/resume.pdf'},
+  social:{instagram:'https://www.instagram.com/aadii_zy?igsh=MWtsdTlwMHU5djlwaA==',github:'https://github.com/kumarpiyush8299-crypto',linkedin:'https://www.linkedin.com/in/piyush-kumar-833489412',whatsapp:'https://wa.me/919234183198',facebook:'https://www.facebook.com/piyush.kumar.9404',twitter:'https://x.com/kumarpiyush8299',youtube:'',behance:'',dribbble:'',tiktok:'',pinterest:'',telegram:''},
+  meta:{published:false,updatedAt:null}
+};
+
+function getPass(){return localStorage.getItem(PASS)||DEF_PASS}
+function isAuth(){return sessionStorage.getItem(AUTH)==='1'}
+function setAuth(v){v?sessionStorage.setItem(AUTH,'1'):sessionStorage.removeItem(AUTH)}
+function loadL(k){try{const r=localStorage.getItem(k);return r?JSON.parse(r):null}catch{return null}}
+function saveL(k,d){localStorage.setItem(k,JSON.stringify(d))}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+function esc(s){return String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
+function merge(d){
+  d=d||{};
+  const o={...structuredClone(DEFAULTS),...d};
+  ['hero','media','travel','cta','footer','design','about','contact','social','meta'].forEach(k=>{o[k]={...DEFAULTS[k],...(d[k]||{})}});
+  ['skills','tools','projects','timeline','highlights','testimonials','websites'].forEach(k=>{if(!d[k])o[k]=structuredClone(DEFAULTS[k])});
+  return o;
+}
+function loadDraft(){return merge(loadL(DRAFT))}
+
+/* AUTH */
+const loginScreen=document.getElementById('loginScreen'),app=document.getElementById('app');
+function showApp(){loginScreen.style.display='none';app.style.display='block';fill(loadDraft());refreshGal();buildIcons();if(typeof wireUploadButtons==='function')wireUploadButtons()}
+function showLogin(){app.style.display='none';loginScreen.style.display='flex'}
+if(isAuth())showApp();
+document.getElementById('loginBtn').onclick=()=>{if(document.getElementById('pin').value.trim()===getPass()){setAuth(true);document.getElementById('loginErr').style.display='none';showApp()}else document.getElementById('loginErr').style.display='block'};
+document.getElementById('pin').onkeydown=e=>{if(e.key==='Enter')document.getElementById('loginBtn').click()};
+document.getElementById('btnLogout').onclick=()=>{setAuth(false);showLogin()};
+
+/* NAV */
+document.querySelectorAll('.nb[data-p]').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('.nb').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.getElementById('p-'+b.dataset.p).classList.add('active');
+    document.getElementById('mainScroll').scrollTo({top:0,behavior:'smooth'});
+  };
+});
+
+function buildIcons(){
+  const g=document.getElementById('iconGrid');g.innerHTML='';
+  ICONS.forEach(ic=>{
+    const b=document.createElement('button');b.type='button';b.innerHTML=`<i class="fa-solid ${ic}"></i>`;
+    b.onclick=()=>{if(!iconTarget){toast('Pehle skill/tool icon pe click karo');return}iconTarget.dataset.icon=ic;iconTarget.innerHTML=`<i class="fa-solid ${ic}"></i>`;toast('Icon set')};
+    g.appendChild(b);
+  });
+}
+
+function skillRow(s){
+  const d=document.createElement('div');d.className='li';const ic=s.icon||'fa-star';
+  d.innerHTML=`<button type="button" class="ip" data-icon="${ic}"><i class="fa-solid ${ic}"></i></button>
+  <div class="field" style="margin:0"><label>Title</label><input class="sk-t" value="${esc(s.title)}"></div>
+  <div class="field full" style="margin:0"><label>Desc</label><input class="sk-d" value="${esc(s.desc)}"></div>
+  <button type="button" class="rm"><i class="fa-solid fa-trash"></i></button>`;
+  d.querySelector('.ip').onclick=function(){iconTarget=this;toast('Ab icon picker se choose karo')};
+  d.querySelector('.rm').onclick=()=>d.remove();return d;
+}
+function toolRow(t){
+  const d=document.createElement('div');d.className='li';d.style.gridTemplateColumns='48px 1fr auto';
+  const name=typeof t==='string'?t:(t.name||'');const ic=(t&&t.icon)||'fa-wrench';
+  d.innerHTML=`<button type="button" class="ip" data-icon="${ic}"><i class="fa-solid ${ic}"></i></button>
+  <div class="field" style="margin:0"><label>Name</label><input class="tl-n" value="${esc(name)}"></div>
+  <button type="button" class="rm"><i class="fa-solid fa-trash"></i></button>`;
+  d.querySelector('.ip').onclick=function(){iconTarget=this};
+  d.querySelector('.rm').onclick=()=>d.remove();return d;
+}
+
+function fill(data){
+  data=merge(data);
+  const H=data.hero;document.getElementById('heroName').value=H.name;document.getElementById('heroRole').value=H.role;
+  document.getElementById('heroHeadline').value=H.headline;document.getElementById('heroBio').value=H.bio;var hp=document.getElementById('heroPassion');if(hp)hp.value=H.passion||'';document.getElementById('heroPhoto').value=H.photo||'';
+  var st=document.getElementById('skillsTitle');if(st)st.value=(data.skillsMeta&&data.skillsMeta.title)||'What I Can Do';var si=document.getElementById('skillsIntro');if(si)si.value=(data.skillsMeta&&data.skillsMeta.intro)||'';
+  const sk=document.getElementById('skillsList');sk.innerHTML='';data.skills.forEach(s=>sk.appendChild(skillRow(s)));
+  var tt=document.getElementById('toolsTitle');if(tt)tt.value=(data.toolsMeta&&data.toolsMeta.title)||'Creative Software';var ti=document.getElementById('toolsIntro');if(ti)ti.value=(data.toolsMeta&&data.toolsMeta.intro)||'';
+  const tl=document.getElementById('toolsList');tl.innerHTML='';data.tools.forEach(t=>tl.appendChild(toolRow(t)));
+  var pjt=document.getElementById('pjTitle');if(pjt)pjt.value=(data.pjMeta&&data.pjMeta.title)||'My Creative Work';var pji=document.getElementById('pjIntro');if(pji)pji.value=(data.pjMeta&&data.pjMeta.intro)||'';
+  const pl=document.getElementById('projectsList');pl.innerHTML='';
+  data.projects.forEach((p,i)=>{
+    const c=document.createElement('div');c.className='card';
+    c.innerHTML=`<h3>Card ${i+1}</h3>
+    <div class="field"><label>Tag</label><input class="pj-tag" value="${esc(p.tag)}"></div>
+    <div class="field"><label>Title</label><input class="pj-title" value="${esc(p.title)}"></div>
+    <div class="field"><label>Desc</label><textarea class="pj-desc">${esc(p.desc)}</textarea></div>
+    <div class="field"><label>Link path</label><input class="pj-link" value="${esc(p.link)}"></div>
+    <div class="field-row" style="margin-bottom:10px;margin-top:6px">
+      <div class="field"><label>Card image path / URL</label><input class="pj-img" value="${esc(p.image||'')}" placeholder="images/project.jpg"></div>
+      <button type="button" class="up-btn pj-up"><i class="fa-solid fa-upload"></i> Upload</button>
+    </div>`;
+    c.querySelector('.pj-up').onclick=function(){ triggerUpload(c.querySelector('.pj-img'), 'image/*'); };
+    pl.appendChild(c);
+  });
+  const M=data.media;document.getElementById('mediaShowreel').value=M.showreel;document.getElementById('mediaPoster').value=M.poster;
+  document.getElementById('mediaTitle').value=M.title;document.getElementById('mediaLine').value=M.line;
+  document.getElementById('travelTitle').value=data.travel.title;document.getElementById('travelLine').value=data.travel.line;
+  var tmt=document.getElementById('tmTitle');if(tmt)tmt.value=(data.tmMeta&&data.tmMeta.title)||'Experience Timeline';var tmi=document.getElementById('tmIntro');if(tmi)tmi.value=(data.tmMeta&&data.tmMeta.intro)||'';
+  const tml=document.getElementById('timelineList');tml.innerHTML='';
+  data.timeline.forEach(t=>{
+    const d=document.createElement('div');d.className='li';d.style.gridTemplateColumns='1fr 1fr 1fr auto';
+    d.innerHTML=`<div class="field" style="margin:0"><label>Year</label><input class="tm-y" value="${esc(t.year)}"></div>
+    <div class="field" style="margin:0"><label>Title</label><input class="tm-t" value="${esc(t.title)}"></div>
+    <div class="field" style="margin:0"><label>Sub</label><input class="tm-s" value="${esc(t.sub)}"></div>
+    <button type="button" class="rm"><i class="fa-solid fa-trash"></i></button>
+    <div class="field full" style="margin:0;grid-column:1/-2"><label>Desc</label><input class="tm-d" value="${esc(t.desc)}"></div>`;
+    d.querySelector('.rm').onclick=()=>d.remove();tml.appendChild(d);
+  });
+  var ht=document.getElementById('hiTitle');if(ht)ht.value=(data.hiMeta&&data.hiMeta.title)||'Highlights';var hi=document.getElementById('hiIntro');if(hi)hi.value=(data.hiMeta&&data.hiMeta.intro)||'';
+  const hl=document.getElementById('highlightsList');hl.innerHTML='';
+  data.highlights.forEach(h=>{
+    const d=document.createElement('div');d.className='li';d.style.gridTemplateColumns='1fr 1fr auto';
+    d.innerHTML=`<div class="field" style="margin:0"><label>Value</label><input class="hi-v" value="${esc(h.value)}"></div>
+    <div class="field" style="margin:0"><label>Label</label><input class="hi-l" value="${esc(h.label)}"></div>
+    <button type="button" class="rm"><i class="fa-solid fa-trash"></i></button>`;
+    d.querySelector('.rm').onclick=()=>d.remove();hl.appendChild(d);
+  });
+  document.getElementById('ctaTitle').value=data.cta.title;document.getElementById('ctaLine').value=data.cta.line;document.getElementById('ctaBtn').value=data.cta.btn;
+  var tst=document.getElementById('tsTitle');if(tst)tst.value=(data.tsMeta&&data.tsMeta.title)||'What People Say';var tsi=document.getElementById('tsIntro');if(tsi)tsi.value=(data.tsMeta&&data.tsMeta.intro)||'';
+  const tes=document.getElementById('testimonialsList');tes.innerHTML='';
+  data.testimonials.forEach(t=>{
+    const c=document.createElement('div');c.className='card';
+    c.innerHTML=`<div class="row"><div class="field"><label>Name</label><input class="ts-n" value="${esc(t.name)}"></div>
+    <div class="field"><label>Role</label><input class="ts-r" value="${esc(t.role)}"></div></div>
+    <div class="field"><label>Text</label><textarea class="ts-t">${esc(t.text)}</textarea></div>
+    <button type="button" class="btn danger rm">Remove</button>`;
+    c.querySelector('.rm').onclick=()=>c.remove();tes.appendChild(c);
+  });
+  document.getElementById('footerCopy').value=data.footer.copy;document.getElementById('footerPrivacy').value=data.footer.privacy;document.getElementById('footerTerms').value=data.footer.terms;
+  const wl=document.getElementById('websitesList');wl.innerHTML='';
+  data.websites.forEach(w=>{
+    const c=document.createElement('div');c.className='card';
+    c.innerHTML=`<div class="row3">
+    <div class="field"><label>Icon/Emoji</label><input class="wb-ic" value="${esc(w.icon||'')}"></div>
+    <div class="field"><label>Tag</label><input class="wb-tag" value="${esc(w.tag)}"></div>
+    <div class="field"><label>Title</label><input class="wb-title" value="${esc(w.title)}"></div></div>
+    <div class="field"><label>Description</label><input class="wb-desc" value="${esc(w.desc||'')}"></div>
+    <div class="field"><label>Path (demos/...)</label><input class="wb-path" value="${esc(w.path)}"></div>
+    <button type="button" class="btn danger rm">Remove</button>`;
+    c.querySelector('.rm').onclick=()=>c.remove();wl.appendChild(c);
+  });
+  const D=data.design;document.getElementById('designTitle').value=D.title;document.getElementById('designDesc').value=D.desc;
+  document.getElementById('designUiux').value=D.uiux;document.getElementById('designGfx').value=D.graphics;document.getElementById('designMotion').value=D.motion;
+  const A=data.about;document.getElementById('aboutTitle').value=A.title;document.getElementById('aboutHello').value=A.hello;
+  document.getElementById('aboutBody').value=A.body;const ap=document.getElementById('aboutPassion');if(ap)ap.value=A.passion||'';document.getElementById('aboutResume').value=A.resume;document.getElementById('aboutPhoto').value=A.photo;
+  const C=data.contact;document.getElementById('contactTitle').value=C.title;document.getElementById('contactLine').value=C.line;const cn=document.getElementById('contactNote');if(cn)cn.value=C.note||'';
+  document.getElementById('contactWa').value=C.wa;document.getElementById('contactEmail').value=C.email;document.getElementById('contactPhone').value=C.phone;document.getElementById('contactResume').value=C.resume;
+  const S=data.social;
+  const sm={socIg:'instagram',socGh:'github',socLi:'linkedin',socWa:'whatsapp',socFb:'facebook',socX:'twitter',socYt:'youtube',socBe:'behance',socDr:'dribbble',socTt:'tiktok',socPin:'pinterest',socTg:'telegram'};
+  Object.keys(sm).forEach(id=>{const el=document.getElementById(id);if(el)el.value=S[sm[id]]||''});
+    updateDash(data);
+}
+
+function read(){
+  return {
+    hero:{name:v('heroName'),role:v('heroRole'),headline:v('heroHeadline'),bio:v('heroBio'),passion:v('heroPassion'),photo:v('heroPhoto')},
+    skillsMeta:{title:v('skillsTitle'),intro:v('skillsIntro')},
+    skills:[...document.querySelectorAll('#skillsList .li')].map(r=>({icon:r.querySelector('.ip').dataset.icon,title:r.querySelector('.sk-t').value.trim(),desc:r.querySelector('.sk-d').value.trim()})).filter(s=>s.title),
+    toolsMeta:{title:v('toolsTitle'),intro:v('toolsIntro')},
+    tools:[...document.querySelectorAll('#toolsList .li')].map(r=>({icon:r.querySelector('.ip').dataset.icon,name:r.querySelector('.tl-n').value.trim()})).filter(t=>t.name),
+    pjMeta:{title:v('pjTitle'),intro:v('pjIntro')},
+    projects:[...document.querySelectorAll('#projectsList .card')].map(c=>({tag:c.querySelector('.pj-tag').value.trim(),title:c.querySelector('.pj-title').value.trim(),desc:c.querySelector('.pj-desc').value.trim(),link:c.querySelector('.pj-link').value.trim(),image:(function(){var el=c.querySelector('.pj-img');return el?el.value.trim():''})()})),
+    media:{showreel:v('mediaShowreel'),poster:v('mediaPoster'),title:v('mediaTitle'),line:v('mediaLine')},
+    travel:{title:v('travelTitle'),line:v('travelLine')},
+    tmMeta:{title:v('tmTitle'),intro:v('tmIntro')},
+    timeline:[...document.querySelectorAll('#timelineList .li')].map(r=>({year:r.querySelector('.tm-y').value.trim(),title:r.querySelector('.tm-t').value.trim(),sub:r.querySelector('.tm-s').value.trim(),desc:r.querySelector('.tm-d').value.trim()})),
+    hiMeta:{title:v('hiTitle'),intro:v('hiIntro')},
+    highlights:[...document.querySelectorAll('#highlightsList .li')].map(r=>({value:r.querySelector('.hi-v').value.trim(),label:r.querySelector('.hi-l').value.trim()})).filter(h=>h.value||h.label),
+    cta:{title:v('ctaTitle'),line:v('ctaLine'),btn:v('ctaBtn')},
+    tsMeta:{title:v('tsTitle'),intro:v('tsIntro')},
+    testimonials:[...document.querySelectorAll('#testimonialsList .card')].map(c=>({name:c.querySelector('.ts-n').value.trim(),role:c.querySelector('.ts-r').value.trim(),text:c.querySelector('.ts-t').value.trim()})),
+    footer:{copy:v('footerCopy'),privacy:v('footerPrivacy'),terms:v('footerTerms')},
+    websites:[...document.querySelectorAll('#websitesList .card')].map(c=>({icon:c.querySelector('.wb-ic').value.trim(),tag:c.querySelector('.wb-tag').value.trim(),title:c.querySelector('.wb-title').value.trim(),desc:c.querySelector('.wb-desc').value.trim(),path:c.querySelector('.wb-path').value.trim()})),
+    design:{title:v('designTitle'),desc:v('designDesc'),uiux:v('designUiux'),graphics:v('designGfx'),motion:v('designMotion')},
+    about:{title:v('aboutTitle'),hello:v('aboutHello'),body:v('aboutBody'),passion:v('aboutPassion'),resume:v('aboutResume'),photo:v('aboutPhoto')},
+    contact:{title:v('contactTitle'),line:v('contactLine'),note:v('contactNote'),wa:v('contactWa'),email:v('contactEmail'),phone:v('contactPhone'),resume:v('contactResume')},
+    social:{instagram:v('socIg'),github:v('socGh'),linkedin:v('socLi'),whatsapp:v('socWa'),facebook:v('socFb'),twitter:v('socX'),youtube:v('socYt'),behance:v('socBe'),dribbble:v('socDr'),tiktok:v('socTt'),pinterest:v('socPin'),telegram:v('socTg')},
+    meta:{published:false,updatedAt:new Date().toISOString()}
+  };
+}
+function v(id){var el=document.getElementById(id);return el?el.value.trim():''}
+
+function updateDash(data){
+  document.getElementById('stSk').textContent=(data.skills||[]).length;
+  document.getElementById('stTl').textContent=(data.tools||[]).length;
+  document.getElementById('stWeb').textContent=(data.websites||[]).length;
+  const live=loadL(LIVE);const pub=!!(live&&live.meta&&live.meta.published);
+  document.getElementById('stSt').textContent=pub?'Live':'Draft';
+  const pill=document.getElementById('statusPill');pill.textContent=pub?'Published':'Draft';pill.className='pill '+(pub?'l':'d');
+}
+
+document.getElementById('addSkill').onclick=()=>document.getElementById('skillsList').appendChild(skillRow({icon:'fa-star',title:'',desc:''}));
+document.getElementById('addTool').onclick=()=>document.getElementById('toolsList').appendChild(toolRow({icon:'fa-wrench',name:''}));
+document.getElementById('addTimeline').onclick=()=>{const d=document.createElement('div');d.className='li';d.style.gridTemplateColumns='1fr 1fr 1fr auto';
+  d.innerHTML=`<div class="field" style="margin:0"><label>Year</label><input class="tm-y"></div><div class="field" style="margin:0"><label>Title</label><input class="tm-t"></div><div class="field" style="margin:0"><label>Sub</label><input class="tm-s"></div><button type="button" class="rm"><i class="fa-solid fa-trash"></i></button><div class="field full" style="margin:0;grid-column:1/-2"><label>Desc</label><input class="tm-d"></div>`;
+  d.querySelector('.rm').onclick=()=>d.remove();document.getElementById('timelineList').appendChild(d)};
+document.getElementById('addHi').onclick=()=>{const d=document.createElement('div');d.className='li';d.style.gridTemplateColumns='1fr 1fr auto';
+  d.innerHTML=`<div class="field" style="margin:0"><label>Value</label><input class="hi-v"></div><div class="field" style="margin:0"><label>Label</label><input class="hi-l"></div><button type="button" class="rm"><i class="fa-solid fa-trash"></i></button>`;
+  d.querySelector('.rm').onclick=()=>d.remove();document.getElementById('highlightsList').appendChild(d)};
+document.getElementById('addTs').onclick=()=>{const c=document.createElement('div');c.className='card';
+  c.innerHTML=`<div class="row"><div class="field"><label>Name</label><input class="ts-n"></div><div class="field"><label>Role</label><input class="ts-r"></div></div><div class="field"><label>Text</label><textarea class="ts-t"></textarea></div><button type="button" class="btn danger rm">Remove</button>`;
+  c.querySelector('.rm').onclick=()=>c.remove();document.getElementById('testimonialsList').appendChild(c)};
+document.getElementById('addWeb').onclick=()=>{const c=document.createElement('div');c.className='card';
+  c.innerHTML=`<div class="row3"><div class="field"><label>Icon</label><input class="wb-ic" value="✨"></div><div class="field"><label>Tag</label><input class="wb-tag"></div><div class="field"><label>Title</label><input class="wb-title"></div></div><div class="field"><label>Desc</label><input class="wb-desc"></div><div class="field"><label>Path</label><input class="wb-path" placeholder="demos/folder/index.html"></div><button type="button" class="btn danger rm">Remove</button>`;
+  c.querySelector('.rm').onclick=()=>c.remove();document.getElementById('websitesList').appendChild(c)};
+
+/* GALLERY */
+const GDB='pk_cinematic_v1',GST='media';
+function openG(){return new Promise((res,rej)=>{const r=indexedDB.open(GDB,1);r.onupgradeneeded=()=>{const db=r.result;if(!db.objectStoreNames.contains(GST))db.createObjectStore(GST,{keyPath:'id'})};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+async function galAll(){const db=await openG();return new Promise((res,rej)=>{const q=db.transaction(GST,'readonly').objectStore(GST).getAll();q.onsuccess=()=>res(q.result||[]);q.onerror=()=>rej(q.error)})}
+async function galPut(rec){const db=await openG();return new Promise((res,rej)=>{const tx=db.transaction(GST,'readwrite');tx.objectStore(GST).put(rec);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error)})}
+async function galDel(id){const db=await openG();return new Promise((res,rej)=>{const tx=db.transaction(GST,'readwrite');tx.objectStore(GST).delete(id);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error)})}
+
+function updateSel(){
+  const n=document.querySelectorAll('#galGrid .g-item.selected').length;
+  document.getElementById('galCnt').textContent=n+' selected';
+  document.getElementById('galDel').disabled=n===0;
+}
+async function refreshGal(){
+  const grid=document.getElementById('galGrid');grid.innerHTML='';
+  let rows=[];try{rows=await galAll()}catch{document.getElementById('stGal').textContent='0';updateSel();return}
+  document.getElementById('stGal').textContent=String(rows.length);
+  rows.sort((a,b)=>(b.ts||0)-(a.ts||0));
+  rows.forEach(row=>{
+    const url=URL.createObjectURL(row.blob);
+    const div=document.createElement('div');div.className='g-item';div.dataset.id=row.id;
+    const vid=(row.type||'').startsWith('video/');
+    div.innerHTML=`${vid?`<video src="${url}" muted playsinline></video>`:`<img src="${url}" alt="">`}<span class="tick"><i class="fa-solid fa-check"></i></span><button type="button" class="unsel">Unselect</button><div class="cap">${row.name||row.id}</div>`;
+    div.onclick=e=>{if(e.target.closest('.unsel')){div.classList.remove('selected');updateSel();e.stopPropagation();return}div.classList.toggle('selected');updateSel()};
+    grid.appendChild(div);
+  });
+  updateSel();
+}
+document.getElementById('galUp').onclick=()=>document.getElementById('galFile').click();
+document.getElementById('galFile').onchange=async e=>{
+  const files=[...e.target.files];let ok=0;
+  for(const f of files){try{const id='u_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);const buf=await f.arrayBuffer();const blob=new Blob([buf],{type:f.type||'application/octet-stream'});await galPut({id,blob,type:f.type||blob.type,ts:Date.now(),name:f.name,sizeClass:'normal',fingerprint:f.name+'|'+f.size});ok++}catch(err){console.warn(err)}}
+  e.target.value='';await refreshGal();toast(ok+' uploaded');
+};
+document.getElementById('galAll').onclick=()=>{document.querySelectorAll('#galGrid .g-item').forEach(i=>i.classList.add('selected'));updateSel()};
+document.getElementById('galNone').onclick=()=>{document.querySelectorAll('#galGrid .g-item').forEach(i=>i.classList.remove('selected'));updateSel()};
+document.getElementById('galDel').onclick=async()=>{const ids=[...document.querySelectorAll('#galGrid .g-item.selected')].map(e=>e.dataset.id);if(!ids.length||!confirm('Delete '+ids.length+'?'))return;for(const id of ids)await galDel(id);await refreshGal();toast('Deleted')};
+
+/* AI + VOICE */
+function suggestIcon(title){const t=(title||'').toLowerCase();if(/web|code|dev/.test(t))return 'fa-laptop-code';if(/ui|ux|design/.test(t))return 'fa-object-group';if(/photo/.test(t))return 'fa-camera-retro';if(/video|film/.test(t))return 'fa-clapperboard';if(/travel/.test(t))return 'fa-earth-asia';return 'fa-star'}
+function polish(s){if(!s)return s;s=s.replace(/\s+/g,' ').trim();return s.charAt(0).toUpperCase()+s.slice(1)}
+function runAI(){
+  const issues=[];const data=read();
+  if(!data.hero.name){data.hero.name='Piyush Kumar';issues.push('Name filled')}
+  data.skills.forEach(s=>{if(!s.icon||s.icon==='fa-star'){s.icon=suggestIcon(s.title);issues.push('Icon: '+s.title)}s.title=polish(s.title);s.desc=polish(s.desc)});
+  data.tools.forEach(t=>{t.name=polish(t.name)});
+  fill(data);document.getElementById('aiReport').innerHTML=issues.length?('<ul style="margin-left:16px;font-size:12px">'+issues.map(i=>'<li>'+i+'</li>').join('')+'</ul>'):'<p style="font-size:12px;color:var(--muted)">All good.</p>';
+  toast('AI done');
+}
+function runCmd(raw){
+  const cmd=(raw||'').trim();if(!cmd)return;const lower=cmd.toLowerCase();let done=false;
+  if(/\bpublish\b|public karo|live karo/.test(lower)){publish();return}
+  if(/\bsave\b|draft/.test(lower)){saveDraft();return}
+  if(/\bpreview\b/.test(lower)){saveDraft().then(()=>window.open('../index.html','_blank'));return}
+  let m=cmd.match(/(?:name|naam)\s+(.+)/i);if(m){document.getElementById('heroName').value=m[1].trim();done=true;toast('Name set')}
+  m=cmd.match(/(?:role|title)\s+(.+)/i);if(m){document.getElementById('heroRole').value=m[1].trim();done=true;toast('Role set')}
+  m=cmd.match(/(?:bio)\s+(.+)/i);if(m){document.getElementById('heroBio').value=m[1].trim();done=true;toast('Bio set')}
+  m=cmd.match(/add skill\s+(.+)/i)||cmd.match(/nayi skill\s+(.+)/i);if(m){const title=m[1].trim();document.getElementById('skillsList').appendChild(skillRow({icon:suggestIcon(title),title,desc:title+'.'}));done=true;toast('Skill added')}
+  m=cmd.match(/add tool\s+(.+)/i);if(m){document.getElementById('toolsList').appendChild(toolRow({icon:'fa-wrench',name:m[1].trim()}));done=true;toast('Tool added')}
+  m=cmd.match(/(?:pin)\s+(\S+)/i);if(m){localStorage.setItem(GPIN,m[1]);done=true;toast('PIN set')}
+  if(/\bai\b|fix|polish/.test(lower)){runAI();return}
+  if(!done&&cmd.length>20){document.getElementById('heroBio').value=cmd;toast('Bio set');done=true}
+  if(!done)toast('Try: name ... / bio ... / add skill ... / publish');
+  if(done)try{saveDraft()}catch(e){}
+}
+document.getElementById('btnAI').onclick=runAI;document.getElementById('btnAI2').onclick=runAI;
+document.getElementById('btnRunCmd').onclick=()=>runCmd(document.getElementById('voiceCmd').value);
+document.getElementById('voiceCmd').onkeydown=e=>{if(e.key==='Enter')runCmd(e.target.value)};
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null;
+if(SR){rec=new SR();rec.lang='en-IN';rec.onresult=e=>{const tx=e.results[0][0].transcript;document.getElementById('voiceCmd').value=tx;runCmd(tx)};
+rec.onstart=()=>document.getElementById('btnMic').classList.add('on');rec.onend=()=>document.getElementById('btnMic').classList.remove('on')}
+document.getElementById('btnMic').onclick=()=>{if(!rec){toast('Chrome me mic use karo');return}try{rec.start()}catch(e){toast('Mic failed')}};
+
+async function saveDraft(){const data=read();data.meta={published:false,updatedAt:new Date().toISOString()};saveL(DRAFT,data);saveL('pk_portfolio_cms_v1',data);updateDash(data);toast('Draft saved');return data}
+async function publish(){const data=await saveDraft();data.meta.published=true;data.meta.publishedAt=new Date().toISOString();saveL(LIVE,data);saveL('pk_portfolio_cms_v1',data);localStorage.setItem(GPIN, localStorage.getItem(GPIN)||'8299');updateDash(data);toast('Published')}
+
+/* ===== FILE UPLOAD (opens system file picker) ===== */
+const ASSET_DB='pk_admin_assets', ASSET_STORE='files';
+function openAssetDB(){
+  return new Promise(function(res,rej){
+    var r=indexedDB.open(ASSET_DB,1);
+    r.onupgradeneeded=function(){var db=r.result;if(!db.objectStoreNames.contains(ASSET_STORE))db.createObjectStore(ASSET_STORE,{keyPath:'id'})};
+    r.onsuccess=function(){res(r.result)};
+    r.onerror=function(){rej(r.error)};
+  });
+}
+function saveAsset(id, file){
+  return file.arrayBuffer().then(function(buf){
+    var blob=new Blob([buf],{type:file.type||'application/octet-stream'});
+    return openAssetDB().then(function(db){
+      return new Promise(function(res,rej){
+        var tx=db.transaction(ASSET_STORE,'readwrite');
+        tx.objectStore(ASSET_STORE).put({id:id,blob:blob,name:file.name,type:file.type,ts:Date.now()});
+        tx.oncomplete=function(){res(URL.createObjectURL(blob))};
+        tx.onerror=function(){rej(tx.error)};
+      });
+    });
+  });
+}
+function triggerUpload(inputEl, accept){
+  if(!inputEl){ toast('Field not found'); return; }
+  var f=document.createElement('input');
+  f.type='file';
+  f.accept=accept||'image/*,video/*,.pdf,application/pdf';
+  f.style.display='none';
+  document.body.appendChild(f);
+  f.addEventListener('change', function(){
+    var file=f.files && f.files[0];
+    document.body.removeChild(f);
+    if(!file) return;
+    var key='asset_'+(inputEl.id||('x'+Date.now()))+'_'+Date.now();
+    saveAsset(key, file).then(function(url){
+      inputEl.value=url;
+      inputEl.dataset.assetKey=key;
+      inputEl.dataset.fileName=file.name;
+      toast('Uploaded: '+file.name);
+    }).catch(function(e){ console.warn(e); toast('Upload failed'); });
+  });
+  f.click();
+}
+function wireUploadButtons(){
+  document.querySelectorAll('.up-btn[data-upload]').forEach(function(btn){
+    if(btn.dataset.wired==='1') return;
+    btn.dataset.wired='1';
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      var id=btn.getAttribute('data-upload');
+      var accept=btn.getAttribute('data-accept')||'image/*,video/*,.pdf';
+      triggerUpload(document.getElementById(id), accept);
+    });
+  });
+}
+wireUploadButtons();
+
+document.getElementById('btnSave').onclick=()=>saveDraft();
+document.getElementById('btnPublish').onclick=()=>{if(confirm('Publish?'))publish()};
+document.getElementById('btnPreview').onclick=()=>saveDraft().then(()=>window.open('../index.html','_blank'));
+document.getElementById('btnExport').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(read(),null,2)],{type:'application/json'}));a.download='portfolio-cms.json';a.click()};
+document.getElementById('btnImport').onclick=()=>document.getElementById('importFile').click();
+document.getElementById('importFile').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());saveL(DRAFT,d);fill(d);toast('Imported')}catch{toast('Invalid JSON')}e.target.value=''};
+document.getElementById('btnPass').onclick=()=>{const c=document.getElementById('curPass').value,n1=document.getElementById('newPass').value,n2=document.getElementById('newPass2').value;if(c!==getPass()){toast('Wrong');return}if(!n1||n1.length<4||n1!==n2){toast('Check password');return}localStorage.setItem(PASS,n1);toast('Password updated')};
+document.getElementById('btnReset').onclick=()=>{if(confirm('Reset draft?')){localStorage.removeItem(DRAFT);fill(DEFAULTS);toast('Reset')}};
+</script>
+</body>
+</html>

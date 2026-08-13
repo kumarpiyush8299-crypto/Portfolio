@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cinematic World | Piyush Kumar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+<link rel="stylesheet" href="../../css/style.css">
+<link rel="stylesheet" href="../../css/responsive.css">
+<link rel="stylesheet" href="../work.css">
+<style>
+body { background: #050816; }
+.work-hero {
+  padding: 120px 24px 12px;
+  text-align: center;
+  background:
+    radial-gradient(circle at 25% 15%, rgba(124,92,255,.14), transparent 42%),
+    radial-gradient(circle at 75% 55%, rgba(0,229,255,.08), transparent 40%);
+}
+.work-hero span {
+  color: #a78bfa; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+}
+.work-hero h1 {
+  font-size: clamp(28px, 5.5vw, 46px); font-weight: 800; margin: 10px 0 8px;
+  background: linear-gradient(90deg, #fff, #c4b5fd, #67e8f9);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.work-hero p { color: rgba(255,255,255,.45); max-width: 540px; margin: 0 auto; font-size: 14px; }
+
+/* toolbar styles merged below */
+
+.back-bar {
+  width: min(1280px, calc(100% - 24px));
+  margin: 0 auto 8px;
+}
+.back-bar a { color: rgba(255,255,255,.38); text-decoration: none; font-size: 13px; }
+.back-bar a:hover { color: #00E5FF; }
+
+/* Auto masonry — tight gaps, no holes, sizes adapt */
+.cine-grid {
+  width: min(1280px, calc(100% - 16px));
+  margin: 0 auto 80px;
+  column-count: 4;
+  column-gap: 8px;
+  /* normal left → right flow */
+}
+.g-item {
+  position: relative;
+  break-inside: avoid;
+  margin: 0 0 8px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0a0e1a;
+  cursor: pointer;
+  width: 100%;
+  display: block;
+}
+/* Smart sizes — portrait → tall, landscape → wide, square → normal */
+.g-item.normal { height: 230px; }
+.g-item.tall   { height: 340px; }   /* portrait */
+.g-item.wide   { height: 170px; }   /* landscape */
+.g-item.big    { height: 290px; }
+.g-item.is-video { height: 210px; }
+.g-item.is-video.tall { height: 320px; }
+.g-item.is-video.wide { height: 180px; }
+
+.g-item img,
+.g-item video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 32%;
+  display: block;
+  image-rendering: auto;
+  transition: transform .55s cubic-bezier(.2,.8,.2,1), filter .3s, object-position .45s ease;
+}
+/* Poster image sits above video until hover */
+.g-item.is-video .vid-poster {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: center 30%;
+  z-index: 1; pointer-events: none;
+  transition: opacity .35s ease;
+}
+.g-item.is-video:hover .vid-poster { opacity: 0; }
+.g-item.is-video video { position: relative; z-index: 0; }
+.g-item:hover img,
+.g-item:hover video {
+  transform: scale(1.04);
+  filter: brightness(1.06);
+}
+.g-item .play-hint {
+  position: absolute; inset: 0; z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,.35));
+  opacity: .85; transition: opacity .25s; pointer-events: none;
+}
+.g-item.is-video:hover .play-hint { opacity: 0; }
+.g-item .play-hint i {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(255,255,255,.95); color: #0a0a12;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+}
+.g-item .item-check,
+.g-item .remove-btn {
+  display: none;
+}
+/* Only when Select mode ON — show select checkbox on cards */
+.select-mode .g-item .item-check {
+  display: block;
+  position: absolute; top: 8px; left: 8px; z-index: 3;
+  width: 20px; height: 20px; accent-color: #00E5FF;
+  cursor: pointer;
+}
+.g-item.selected {
+  outline: 2px solid #00E5FF;
+  outline-offset: 1px;
+}
+
+.upload-bar { display:none !important;
+  width: min(1280px, calc(100% - 16px));
+  margin: 12px auto 10px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* RIGHT */
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 0 4px;
+}
+.toolbar-actions {
+  display: flex; align-items: center; gap: 8px;
+  flex-direction: row; /* lock → upload → select → all → delete */
+}
+/* Icon-only circular buttons */
+.icon-btn {
+  width: 42px; height: 42px; border-radius: 12px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.85);
+  cursor: pointer; font-size: 15px;
+  transition: .2s; font-family: inherit;
+}
+.icon-btn:hover { border-color: #00E5FF; color: #00E5FF; background: rgba(0,229,255,.08); }
+.icon-btn.upload-btn {
+  width: auto; padding: 0 14px; gap: 8px; font-size: 13px; font-weight: 700;
+  background: linear-gradient(135deg, #7C5CFF, #00E5FF);
+  color: #0a0a12; border: none;
+  box-shadow: 0 8px 22px rgba(124,92,255,.28);
+}
+.icon-btn.upload-btn:hover { filter: brightness(1.06); color: #0a0a12; }
+.icon-btn.danger {
+  border-color: rgba(239,68,68,.45);
+  color: #fca5a5;
+  background: rgba(239,68,68,.12);
+}
+.icon-btn.danger:hover { background: rgba(239,68,68,.28); color: #fff; }
+.icon-btn:disabled { opacity: .35; cursor: not-allowed; }
+#selCount { font-size: 12px; color: rgba(255,255,255,.4); }
+.owner-only { display: none; }
+body.owner-unlocked .owner-only { display: inline-flex; }
+.lock-hint { font-size: 11px; color: rgba(255,255,255,.3); margin-left: 4px; }
+#fileInput { display: none; }
+
+
+@media (max-width: 1000px) {
+  .cine-grid { column-count: 3; column-gap: 7px; }
+  .g-item { margin-bottom: 7px; border-radius: 10px; }
+  .g-item.normal { height: 205px; }
+  .g-item.tall { height: 300px; }
+  .g-item.wide { height: 155px; }
+  .g-item.is-video { height: 190px; }
+  .g-item.is-video.tall { height: 280px; }
+}
+@media (max-width: 600px) {
+  .cine-grid { column-count: 2; column-gap: 6px; width: calc(100% - 12px); }
+  .g-item { margin-bottom: 6px; border-radius: 9px; }
+  .g-item.normal { height: 175px; }
+  .g-item.tall { height: 250px; }
+  .g-item.wide { height: 135px; }
+  .g-item.is-video { height: 165px; }
+  .g-item.is-video.tall { height: 230px; }
+}
+
+.lightbox {
+  position: fixed; inset: 0; z-index: 10050;
+  background: rgba(0,0,0,.94);
+  display: none; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.lightbox.open { display: flex; }
+.lightbox img, .lightbox video {
+  max-width: min(98vw, 1400px);
+  max-height: 92vh;
+  border-radius: 8px;
+  object-fit: contain;
+}
+.lightbox .close {
+  position: absolute; top: 16px; right: 18px;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(255,255,255,.12); border: none; color: #fff;
+  font-size: 17px; cursor: pointer;
+  z-index: 2;
+}
+/* Hide header when photo/video lightbox is open */
+body.lightbox-open #header {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+</style>
+</head>
+<body>
+<div id="particles-js"></div>
+<canvas id="bgCanvas"></canvas>
+
+<header id="header" role="banner">
+        <div class="nav-wrapper">
+            <a href="../../index.html" class="logo">
+            <div class="logo-circle">PK</div>
+            <div class="logo-text">
+                <h3>Piyush Kumar</h3>
+                <span>Creative Developer</span>
+            </div>
+            </a>
+        <nav class="desktop-nav" aria-label="Primary Navigation">
+            <ul>
+                <li><a href="../../index.html">Home</a></li>
+                <li><a href="../../index.html#services">Skills</a></li>
+                <li><a href="../../index.html#projects">Projects</a></li>
+                <li><a href="../../work/cinematic/index.html" class="active">Gallery</a></li>
+                <li><a href="../../about/index.html">About</a></li>
+                <li><a href="../../contact/index.html">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="nav-right">
+            <button id="menuBtn" aria-label="Open Menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </div>
+</header>
+    <div class="menu-overlay"></div>
+<div class="mobile-menu">
+    <div class="menu-close">
+        <i class="fa-solid fa-xmark"></i>
+    </div>
+    <ul>
+    <li><a href="../../index.html">Home</a></li>
+    <li><a href="../../index.html#services">Skills</a></li>
+    <li><a href="../../index.html#projects">Projects</a></li>
+    <li><a href="../../work/cinematic/index.html" class="active">Gallery</a></li>
+    <li><a href="../../about/index.html">About</a></li>
+    <li><a href="../../contact/index.html">Contact</a></li>
+    </ul>
+    <div class="menu-social">
+        <a href="https://www.instagram.com/aadii_zy?igsh=MWtsdTlwMHU5djlwaA==" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+        <a href="https://github.com/kumarpiyush8299-crypto" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i></a>
+        <a href="https://www.linkedin.com/in/piyush-kumar-833489412" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin"></i></a>
+        <a href="https://wa.me/919234183198" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp"></i></a>
+    </div>
+</div>
+
+<section class="work-hero">
+  <span>CINEMATIC WORLD</span>
+  <h1>Photography · Travel · Film</h1>
+  <p>Natural frames, mixed sizes — landscapes, portraits, streets, journeys and motion in one stream.</p>
+</section>
+
+<div class="cine-grid" id="gallery">
+<div class="g-item tall"><img src="../photography/images/p1.jpg" loading="lazy" alt=""></div>
+<div class="g-item normal"><img src="../photography/images/p2.jpg" loading="lazy" alt=""></div>
+<div class="g-item wide"><img src="../photography/images/p3.jpg" loading="lazy" alt=""></div>
+<div class="g-item normal"><img src="../photography/images/p4.jpg" loading="lazy" alt=""></div>
+<div class="g-item tall"><img src="../photography/images/p5.jpg" loading="lazy" alt=""></div>
+<div class="g-item normal"><img src="../photography/images/p6.jpg" loading="lazy" alt=""></div>
+<div class="g-item wide is-video"><video src="../videography/videos/v1.mp4" muted loop playsinline preload="auto"></video><div class="play-hint"><i class="fa-solid fa-play"></i></div></div>
+<div class="g-item wide"><img src="../photography/images/p7.jpg" loading="lazy" alt=""></div>
+<div class="g-item normal"><img src="../photography/images/p8.jpg" loading="lazy" alt=""></div>
+<div class="g-item tall"><img src="../photography/images/p10.jpg" loading="lazy" alt=""></div>
+<div class="g-item normal"><img src="../photography/images/p12.jpg" loading="lazy" alt=""></div>
+<div class="g-item wide"><img src="../photography/images/p14.jpg" loading="lazy" alt=""></div>
+<div class="g-item normal"><img src="../photography/images/p16.jpg" loading="lazy" alt=""></div>
+<div class="g-item wide is-video"><video src="../videography/videos/v2.mp4" muted loop playsinline preload="auto"></video><div class="play-hint"><i class="fa-solid fa-play"></i></div></div>
+<div class="g-item tall"><img src="../photography/images/p18.jpg" loading="lazy" alt=""></div>
+<div class="g-item normal"><img src="../photography/images/p20.jpg" loading="lazy" alt=""></div>
+<div class="g-item normal"><img src="../travel/images/t1.jpg" loading="lazy" alt=""></div>
+<div class="g-item wide"><img src="../travel/images/t3.jpg" loading="lazy" alt=""></div>
+<div class="g-item tall"><img src="../travel/images/t5.jpg" loading="lazy" alt=""></div>
+<div class="g-item normal"><img src="../travel/images/t8.jpg" loading="lazy" alt=""></div>
+<div class="g-item wide is-video"><video src="../videography/videos/v3.mp4" muted loop playsinline preload="auto"></video><div class="play-hint"><i class="fa-solid fa-play"></i></div></div>
+<div class="g-item wide"><img src="../travel/images/t12.jpg" loading="lazy" alt=""></div>
+<div class="g-item normal"><img src="../travel/images/t16.jpg" loading="lazy" alt=""></div>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <button class="close" id="lbClose" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+  <div id="lbContent"></div>
+</div>
+
+<footer class="work-footer">© 2026 Piyush Kumar · Cinematic World</footer>
+
+<script>
+/* Owner PIN — change this to your secret. Only with this can upload/delete. */
+const OWNER_PIN = (function(){
+  try { return localStorage.getItem("pk_gallery_pin") || "8299"; } catch(e) { return "8299"; }
+})();
+const OWNER_KEY = "pk_cinematic_owner";
+const DB_NAME = "pk_cinematic_v1";
+const DB_VER = 1;
+const STORE = "media";
+const HIDDEN_KEY = "pk_cinematic_hidden_defaults";
+
+function isOwner() {
+  return sessionStorage.getItem(OWNER_KEY) === "1";
+}
+function setOwner(v) {
+  if (v) sessionStorage.setItem(OWNER_KEY, "1");
+  else sessionStorage.removeItem(OWNER_KEY);
+  document.body.classList.toggle("owner-unlocked", !!v);
+  // Owner toolbar removed — manage gallery from Admin dashboard only
+}
+
+const __lockBtn = document.getElementById("ownerLockBtn");
+if (__lockBtn) __lockBtn.onclick = () => {
+  if (isOwner()) {
+    setOwner(false);
+    return;
+  }
+  const pin = prompt("Owner PIN:");
+  if (pin === OWNER_PIN) setOwner(true);
+  else if (pin !== null) alert("Wrong PIN");
+};
+
+/* IndexedDB */
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, { keyPath: "id" });
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function idbPut(record) {
+  const db = await openDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(STORE, "readwrite");
+    tx.objectStore(STORE).put(record);
+    tx.oncomplete = () => res();
+    tx.onerror = () => rej(tx.error);
+  });
+}
+async function idbDelete(id) {
+  const db = await openDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(STORE, "readwrite");
+    tx.objectStore(STORE).delete(id);
+    tx.oncomplete = () => res();
+    tx.onerror = () => rej(tx.error);
+  });
+}
+async function idbAll() {
+  const db = await openDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(STORE, "readonly");
+    const req = tx.objectStore(STORE).getAll();
+    req.onsuccess = () => res(req.result || []);
+    req.onerror = () => rej(req.error);
+  });
+}
+
+/** Fingerprint so same file cannot be uploaded twice */
+async function fileFingerprint(file) {
+  const key = file.name + "|" + file.size + "|" + (file.lastModified || 0);
+  try {
+    const slice = file.slice(0, Math.min(65536, file.size));
+    const buf = await slice.arrayBuffer();
+    const arr = new Uint8Array(buf);
+    let h = 2166136261;
+    for (let i = 0; i < arr.length; i++) {
+      h ^= arr[i];
+      h = Math.imul(h, 16777619);
+    }
+    return key + "|" + (h >>> 0).toString(16);
+  } catch (e) {
+    return key;
+  }
+}
+
+async function isDuplicateUpload(fp) {
+  const rows = await idbAll();
+  return rows.some((r) => r.fingerprint === fp);
+}
+
+function getHiddenDefaults() {
+  try { return JSON.parse(localStorage.getItem(HIDDEN_KEY) || "[]"); } catch { return []; }
+}
+function setHiddenDefaults(arr) {
+  localStorage.setItem(HIDDEN_KEY, JSON.stringify(arr));
+}
+function hideDefault(src) {
+  const arr = getHiddenDefaults();
+  if (!arr.includes(src)) { arr.push(src); setHiddenDefaults(arr); }
+}
+
+const gallery = document.getElementById("gallery");
+const fileInput = document.getElementById("fileInput");
+let selectMode = false;
+
+const __up = document.getElementById("uploadTrigger");
+if (__up && fileInput) __up.onclick = () => { if (!isOwner()) return; fileInput.click(); };
+
+function uid() {
+  return "u_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8);
+}
+function mediaSrc(item) {
+  const img = item.querySelector("img:not(.vid-poster)");
+  const vid = item.querySelector("video");
+  if (img) return img.getAttribute("src") || "";
+  if (vid) return vid.getAttribute("src") || "";
+  return "";
+}
+
+/** Portrait / landscape / square → masonry size class */
+function aspectToSizeClass(w, h) {
+  if (!w || !h) return "normal";
+  const r = w / h;
+  if (r < 0.78) return "tall";       // strong portrait
+  if (r < 0.95) return "tall";       // mild portrait
+  if (r > 1.45) return "wide";       // strong landscape
+  if (r > 1.18) return "wide";       // mild landscape
+  if (r > 0.95 && r < 1.05) return "normal"; // square
+  return "normal";
+}
+
+function setItemSizeClass(item, sizeClass, isVideo) {
+  item.classList.remove("tall", "normal", "wide", "big", "is-video");
+  item.classList.add(sizeClass || "normal");
+  if (isVideo) item.classList.add("is-video");
+}
+
+/** Capture a clear frame from video for poster thumbnail */
+function captureVideoPoster(video, preferTime) {
+  return new Promise((resolve) => {
+    const finish = (dataUrl) => resolve(dataUrl || null);
+    const tryCapture = () => {
+      try {
+        const w = video.videoWidth, h = video.videoHeight;
+        if (!w || !h) { finish(null); return; }
+        const maxSide = 720;
+        let cw = w, ch = h;
+        if (Math.max(w, h) > maxSide) {
+          const s = maxSide / Math.max(w, h);
+          cw = Math.round(w * s);
+          ch = Math.round(h * s);
+        }
+        const c = document.createElement("canvas");
+        c.width = cw; c.height = ch;
+        c.getContext("2d").drawImage(video, 0, 0, cw, ch);
+        finish(c.toDataURL("image/jpeg", 0.88));
+      } catch (e) { finish(null); }
+    };
+    const onMeta = () => {
+      const dur = video.duration;
+      let t = preferTime;
+      if (t == null || !isFinite(t)) {
+        if (isFinite(dur) && dur > 0) t = Math.min(Math.max(dur * 0.15, 0.4), Math.max(dur - 0.2, 0.4));
+        else t = 0.6;
+      }
+      const onSeeked = () => {
+        video.removeEventListener("seeked", onSeeked);
+        tryCapture();
+      };
+      video.addEventListener("seeked", onSeeked);
+      try {
+        video.currentTime = Math.min(t, (isFinite(dur) ? dur * 0.9 : t));
+      } catch (e) {
+        video.removeEventListener("seeked", onSeeked);
+        // some browsers block seek before play — try at 0
+        setTimeout(tryCapture, 80);
+      }
+    };
+    if (video.readyState >= 2 && video.videoWidth) onMeta();
+    else {
+      video.addEventListener("loadeddata", onMeta, { once: true });
+      video.addEventListener("error", () => finish(null), { once: true });
+      // safety timeout
+      setTimeout(() => { if (!video.videoWidth) finish(null); }, 4000);
+    }
+  });
+}
+
+/** Apply orientation size + face/subject focus (images) or poster (videos) */
+async function smartLayoutItem(item) {
+  const img = item.querySelector("img:not(.vid-poster)");
+  const vid = item.querySelector("video");
+
+  if (img && !vid) {
+    const run = async () => {
+      const w = img.naturalWidth, h = img.naturalHeight;
+      if (w && h) setItemSizeClass(item, aspectToSizeClass(w, h), false);
+      await focusSubject(img);
+    };
+    if (img.complete && img.naturalWidth) await run();
+    else {
+      await new Promise((res) => {
+        img.addEventListener("load", res, { once: true });
+        img.addEventListener("error", res, { once: true });
+      });
+      await run();
+    }
+    return;
+  }
+
+  if (vid) {
+    item.classList.add("is-video");
+    // wait for dimensions
+    await new Promise((res) => {
+      if (vid.videoWidth) res();
+      else {
+        vid.addEventListener("loadedmetadata", res, { once: true });
+        vid.addEventListener("error", res, { once: true });
+        setTimeout(res, 3000);
+      }
+    });
+    const w = vid.videoWidth, h = vid.videoHeight;
+    if (w && h) setItemSizeClass(item, aspectToSizeClass(w, h), true);
+    else setItemSizeClass(item, "wide", true);
+
+    // Generate nice poster if missing
+    if (!item.querySelector(".vid-poster")) {
+      const posterUrl = await captureVideoPoster(vid);
+      if (posterUrl) {
+        const poster = document.createElement("img");
+        poster.className = "vid-poster";
+        poster.src = posterUrl;
+        poster.alt = "";
+        item.insertBefore(poster, vid);
+        // also set native poster for fallback
+        vid.setAttribute("poster", posterUrl);
+        // focus poster on faces if possible
+        poster.onload = () => focusSubject(poster);
+      }
+    }
+  }
+}
+
+/* ---- Face / subject auto-center (improved) ---- */
+let faceDetector = null;
+async function getDetector() {
+  if (faceDetector) return faceDetector;
+  if (typeof FaceDetector !== "undefined") {
+    try {
+      faceDetector = new FaceDetector({ fastMode: false, maxDetectedFaces: 5 });
+      return faceDetector;
+    } catch (e) {}
+  }
+  return null;
+}
+
+function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+/** Draw image to canvas (helps FaceDetector + analysis on all sources) */
+function imageToCanvas(img, maxSide) {
+  const nw = img.naturalWidth || img.width;
+  const nh = img.naturalHeight || img.height;
+  if (!nw || !nh) return null;
+  let w = nw, h = nh;
+  if (maxSide && Math.max(w, h) > maxSide) {
+    const s = maxSide / Math.max(w, h);
+    w = Math.round(w * s);
+    h = Math.round(h * s);
+  }
+  const c = document.createElement("canvas");
+  c.width = w; c.height = h;
+  const ctx = c.getContext("2d", { willReadFrequently: true });
+  ctx.drawImage(img, 0, 0, w, h);
+  return c;
+}
+
+/** Skin + attention heatmap — finds face-like / subject region */
+function smartSubjectPosition(canvas) {
+  const cw = canvas.width, ch = canvas.height;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  const data = ctx.getImageData(0, 0, cw, ch).data;
+  let sumW = 0, sumX = 0, sumY = 0;
+  let best = 0, bx = 0.5, by = 0.35;
+  const step = 2;
+  for (let y = 0; y < ch; y += step) {
+    for (let x = 0; x < cw; x += step) {
+      const i = (y * cw + x) * 4;
+      const r = data[i], g = data[i + 1], b = data[i + 2];
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      // YCbCr-ish skin detection (works across many skin tones)
+      const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+      const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+      const isSkin = (cr > 133 && cr < 173 && cb > 77 && cb < 127 && r > 60 && g > 30 && b > 15);
+      const sat = max === 0 ? 0 : (max - min) / max;
+      const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      // Prefer upper-mid frame (portraits), skin, moderate brightness
+      const yBias = 1.35 - (y / ch); // higher weight on top
+      let score = 0;
+      if (isSkin) score += 14 * yBias;
+      // eyes/face often higher contrast in upper half
+      if (y / ch < 0.55 && isSkin) score += 6;
+      score += sat * 1.5 * yBias;
+      score += (1 - Math.abs(lum - 0.42)) * 1.1;
+      if (score > best) { best = score; bx = x / cw; by = y / ch; }
+      sumW += score;
+      sumX += score * (x / cw);
+      sumY += score * (y / ch);
+    }
+  }
+  if (sumW > 0) {
+    // blend peak + weighted centroid for stability
+    const cx = sumX / sumW;
+    const cy = sumY / sumW;
+    return {
+      x: clamp((bx * 0.45 + cx * 0.55) * 100, 8, 92),
+      y: clamp((by * 0.5 + cy * 0.5) * 100 - 4, 5, 85),
+      score: best
+    };
+  }
+  return { x: 50, y: 35, score: 0 };
+}
+
+async function focusSubject(img) {
+  if (!img || img.tagName !== "IMG") return;
+  const apply = (x, y, tag) => {
+    img.style.objectPosition = clamp(x, 0, 100).toFixed(1) + "% " + clamp(y, 0, 100).toFixed(1) + "%";
+    if (tag) img.dataset.faceFocus = tag;
+  };
+
+  if (!img.complete || !img.naturalWidth) {
+    await new Promise((res) => {
+      img.addEventListener("load", res, { once: true });
+      img.addEventListener("error", res, { once: true });
+    });
+  }
+  if (!img.naturalWidth) return;
+
+  // Always analyze on canvas (works for blob uploads + many local files)
+  const canvas = imageToCanvas(img, 640);
+  if (!canvas) { apply(50, 35, "fallback"); return; }
+
+  // 1) Native FaceDetector on canvas bitmap
+  const det = await getDetector();
+  if (det) {
+    try {
+      const faces = await det.detect(canvas);
+      if (faces && faces.length) {
+        let best = faces[0], bestArea = 0;
+        for (const f of faces) {
+          const a = f.boundingBox.width * f.boundingBox.height;
+          if (a > bestArea) { best = f; bestArea = a; }
+        }
+        const b = best.boundingBox;
+        const cx = ((b.x + b.width / 2) / canvas.width) * 100;
+        // slight upward bias for forehead/headroom
+        const cy = ((b.y + b.height * 0.4) / canvas.height) * 100;
+        apply(cx, cy, "face");
+        return;
+      }
+    } catch (e) { /* fall through */ }
+  }
+
+  // 2) Smart skin / subject heatmap
+  try {
+    const pos = smartSubjectPosition(canvas);
+    apply(pos.x, pos.y, pos.score > 3 ? "smart" : "center");
+  } catch (e) {
+    apply(50, 35, "fallback");
+  }
+}
+
+/** Force masonry columns to reflow left→right after delete */
+function reflowGallery() {
+  const g = document.getElementById("gallery");
+  if (!g) return;
+  // force reflow so CSS columns pack from top-left again
+  const prev = g.style.columnCount;
+  g.style.columnCount = "1";
+  void g.offsetHeight;
+  g.style.columnCount = prev || "";
+  // second tick for stubborn browsers
+  requestAnimationFrame(() => {
+    g.style.columnCount = "1";
+    void g.offsetHeight;
+    g.style.columnCount = "";
+  });
+}
+
+function focusItem(item) {
+  // full smart layout: orientation + face/subject + video poster
+  smartLayoutItem(item).catch(() => {});
+}
+
+function wireVideoHover(item) {
+  const v = item.querySelector("video");
+  if (!v) return;
+  item.addEventListener("mouseenter", () => {
+    v.play().catch(() => {});
+  });
+  item.addEventListener("mouseleave", () => {
+    v.pause();
+    try { v.currentTime = 0; } catch (e) {}
+  });
+}
+
+function bindLightbox(item) {
+  item.addEventListener("click", (e) => {
+    if (e.target.closest(".item-check")) return;
+    if (selectMode) {
+      if (!isOwner()) return;
+      const cb = item.querySelector(".item-check");
+      if (cb) {
+        cb.checked = !cb.checked;
+        item.classList.toggle("selected", cb.checked);
+        updateSelUI();
+      }
+      return;
+    }
+    const img = item.querySelector("img");
+    const vid = item.querySelector("video");
+    const lb = document.getElementById("lightbox");
+    const box = document.getElementById("lbContent");
+    box.innerHTML = "";
+    if (vid) {
+      const v = document.createElement("video");
+      v.src = vid.currentSrc || vid.src;
+      v.controls = true; v.autoplay = true;
+      v.style.maxWidth = "98vw"; v.style.maxHeight = "92vh";
+      box.appendChild(v);
+    } else if (img) {
+      const i = document.createElement("img");
+      i.src = img.src;
+      box.appendChild(i);
+    }
+    lb.classList.add("open");
+    document.body.classList.add("lightbox-open");
+  });
+}
+
+function addControls(item) {
+  if (!item.querySelector(".item-check")) {
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.className = "item-check";
+    cb.addEventListener("click", (e) => e.stopPropagation());
+    cb.addEventListener("change", () => {
+      item.classList.toggle("selected", cb.checked);
+      updateSelUI();
+    });
+    item.prepend(cb);
+  }
+  // no per-item delete button — only via select → delete
+}
+
+async function deleteItem(item) {
+  const id = item.dataset.id;
+  const kind = item.dataset.kind;
+  if (kind === "upload" && id) await idbDelete(id);
+  else {
+    const src = mediaSrc(item);
+    if (src) hideDefault(src);
+  }
+  item.remove();
+  reflowGallery();
+}
+
+function selectedItems() {
+  return [...gallery.querySelectorAll(".g-item.selected")];
+}
+
+function updateSelUI() {
+  const n = selectedItems().length;
+  const del = document.getElementById("deleteBtn");
+  const allBtn = document.getElementById("selectAllBtn");
+  const count = document.getElementById("selCount");
+  del.disabled = !(selectMode && n > 0);
+  allBtn.style.display = selectMode ? "inline-flex" : "none";
+  count.textContent = selectMode ? (n ? n + " selected" : "tap to select") : "";
+  const selBtn = document.getElementById("selectBtn");
+  if (selectMode) {
+    selBtn.title = "Cancel select";
+    selBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+  } else {
+    selBtn.title = "Select";
+    selBtn.innerHTML = '<i class="fa-solid fa-check-double"></i>';
+  }
+}
+
+function exitSelectMode() {
+  selectMode = false;
+  document.body.classList.remove("select-mode");
+  gallery.querySelectorAll(".g-item.selected").forEach((el) => {
+    el.classList.remove("selected");
+    const cb = el.querySelector(".item-check");
+    if (cb) cb.checked = false;
+  });
+  updateSelUI();
+}
+
+(document.getElementById("selectBtn")||{}).onclick = () => {
+  if (!isOwner()) return;
+  if (selectMode) {
+    exitSelectMode();
+    return;
+  }
+  selectMode = true;
+  document.body.classList.add("select-mode");
+  updateSelUI();
+};
+
+(document.getElementById("selectAllBtn")||{}).onclick = () => {
+  if (!isOwner() || !selectMode) return;
+  const items = [...gallery.querySelectorAll(".g-item")];
+  const allOn = items.every((el) => el.classList.contains("selected"));
+  items.forEach((el) => {
+    const cb = el.querySelector(".item-check");
+    const on = !allOn;
+    el.classList.toggle("selected", on);
+    if (cb) cb.checked = on;
+  });
+  updateSelUI();
+};
+
+(document.getElementById("deleteBtn")||{}).onclick = async () => {
+  if (!isOwner()) return;
+  const list = selectedItems();
+  if (!list.length) return;
+  if (!confirm("Delete " + list.length + " item(s)?")) return;
+  for (const item of list) await deleteItem(item);
+  reflowGallery();
+  exitSelectMode();
+};
+
+function initDefaults() {
+  const hidden = getHiddenDefaults();
+  const items = [...gallery.querySelectorAll(".g-item")];
+  items.forEach((item) => {
+    const src = mediaSrc(item);
+    if (hidden.includes(src)) { item.remove(); return; }
+    item.dataset.kind = "default";
+    item.dataset.id = "def_" + src;
+    addControls(item);
+    bindLightbox(item);
+    wireVideoHover(item);
+    // Auto orientation + face/subject + video poster
+    focusItem(item);
+  });
+  // reflow after sizes settle
+  setTimeout(reflowGallery, 600);
+  setTimeout(reflowGallery, 1600);
+}
+
+function createItemFromBlob({ id, blob, type, sizeClass }) {
+  const url = URL.createObjectURL(blob);
+  const isVideo = type.startsWith("video/");
+  const div = document.createElement("div");
+  // temporary class — smartLayoutItem will correct from real aspect ratio
+  div.className = "g-item " + (isVideo ? "wide is-video" : (sizeClass || "normal"));
+  div.dataset.kind = "upload";
+  div.dataset.id = id;
+  if (isVideo) {
+    div.innerHTML = '<video src="' + url + '" muted loop playsinline preload="auto"></video><div class="play-hint"><i class="fa-solid fa-play"></i></div>';
+    wireVideoHover(div);
+  } else {
+    div.innerHTML = '<img src="' + url + '" alt="">';
+  }
+  addControls(div);
+  bindLightbox(div);
+  focusItem(div); // orientation + face + video poster
+  return div;
+}
+
+async function loadUploads() {
+  const rows = await idbAll();
+  rows.sort((a, b) => (a.ts || 0) - (b.ts || 0));
+  for (const row of rows) {
+    gallery.appendChild(createItemFromBlob(row));
+  }
+  setTimeout(reflowGallery, 500);
+  setTimeout(reflowGallery, 1500);
+}
+
+if (fileInput) fileInput.addEventListener("change", async (e) => {
+  if (!isOwner()) return;
+  const files = [...e.target.files];
+  let added = 0, skipped = 0;
+  for (const file of files) {
+    const fp = await fileFingerprint(file);
+    if (await isDuplicateUpload(fp)) {
+      skipped++;
+      continue;
+    }
+    const id = uid();
+    const buffer = await file.arrayBuffer();
+    const blob = new Blob([buffer], { type: file.type });
+    // sizeClass is provisional — smartLayoutItem detects real aspect
+    const record = {
+      id, blob,
+      type: file.type || "application/octet-stream",
+      sizeClass: file.type.startsWith("video/") ? "wide" : "normal",
+      ts: Date.now(),
+      name: file.name,
+      fingerprint: fp
+    };
+    await idbPut(record);
+    gallery.appendChild(createItemFromBlob(record));
+    added++;
+  }
+  fileInput.value = "";
+  setTimeout(reflowGallery, 400);
+  setTimeout(reflowGallery, 1200);
+  if (skipped && !added) alert("Ye file pehle se gallery me hai — dubara upload nahi hogi.");
+  else if (skipped) alert(skipped + " duplicate file(s) skip ho gayi.");
+});
+
+const lb = document.getElementById("lightbox");
+function closeLightbox() {
+  lb.classList.remove("open");
+  document.getElementById("lbContent").innerHTML = "";
+  document.body.classList.remove("lightbox-open");
+}
+document.getElementById("lbClose").onclick = closeLightbox;
+lb.addEventListener("click", (e) => {
+  if (e.target === lb) closeLightbox();
+});
+/* ESC key also closes lightbox and restores header */
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && lb.classList.contains("open")) closeLightbox();
+});
+
+/* boot */
+setOwner(isOwner());
+initDefaults();
+loadUploads().catch(console.error);
+</script>
+<script src="../../js/script.js"></script>
+</body>
+</html>

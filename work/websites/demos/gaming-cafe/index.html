@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeonArena Gaming Cafe</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Poppins,sans-serif;background:#0b1026;color:#fff;line-height:1.7;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{text-decoration:none;color:inherit}
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
+padding:16px 6%;background:rgba(0,0,0,.55);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.08);
+animation:slideDown .6s ease}
+.brand{font-weight:800;font-size:22px;letter-spacing:-.5px;color:#a855f7}
+.nav-links a{margin-left:22px;font-size:14px;font-weight:500;color:rgba(255,255,255,.75);transition:.25s}
+.nav-links a:hover{color:#a855f7}
+.hero{min-height:100vh;display:flex;align-items:center;padding:120px 6% 80px;position:relative;
+background:linear-gradient(135deg,rgba(0,0,0,.65),rgba(0,0,0,.35)),url('img/hero.jpg') center/cover no-repeat}
+.hero-content{max-width:640px;animation:fadeUp .9s ease both}
+.hero-kicker{display:inline-block;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+color:#a855f7;margin-bottom:16px}
+.hero h1{font-size:clamp(36px,6vw,64px);font-weight:800;line-height:1.1;margin-bottom:18px}
+.hero p{font-size:17px;color:rgba(255,255,255,.8);margin-bottom:32px;max-width:520px}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 28px;border-radius:12px;font-weight:600;font-size:15px;
+background:#a855f7;color:#fff;border:none;cursor:pointer;transition:.3s;box-shadow:0 12px 30px rgba(0,0,0,.3)}
+.btn:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(0,0,0,.4);filter:brightness(1.08)}
+.btn-outline{background:transparent;border:1.5px solid rgba(255,255,255,.4);margin-left:12px}
+.btn-outline:hover{border-color:#a855f7;color:#a855f7}
+.section{padding:90px 6%}
+.section-title{text-align:center;margin-bottom:50px}
+.section-title span{font-size:12px;font-weight:700;letter-spacing:3px;color:#a855f7;text-transform:uppercase}
+.section-title h2{font-size:clamp(28px,4vw,40px);font-weight:800;margin:10px 0}
+.section-title p{color:rgba(255,255,255,.55);max-width:520px;margin:0 auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px}
+.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:28px;
+transition:.35s;animation:fadeUp .7s ease both}
+.card:hover{transform:translateY(-8px);border-color:#a855f7;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.card .icon{font-size:32px;margin-bottom:14px}
+.card h3{font-size:18px;margin-bottom:8px}
+.card p{color:rgba(255,255,255,.6);font-size:14px}
+.img-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:40px}
+.img-row img{border-radius:16px;height:280px;width:100%;object-fit:cover;transition:.4s}
+.img-row img:hover{transform:scale(1.02)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}
+.split img{border-radius:20px;height:360px;width:100%;object-fit:cover}
+.stats{display:flex;flex-wrap:wrap;gap:40px;justify-content:center;text-align:center;padding:60px 6%;
+background:rgba(255,255,255,.03);border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06)}
+.stat strong{display:block;font-size:36px;font-weight:800;color:#a855f7}
+.stat span{font-size:14px;color:rgba(255,255,255,.55)}
+.cta-band{text-align:center;padding:90px 6%;background:linear-gradient(135deg,rgba(0,0,0,.4),rgba(0,0,0,.2))}
+.cta-band h2{font-size:clamp(26px,4vw,40px);margin-bottom:14px}
+.cta-band p{color:rgba(255,255,255,.6);margin-bottom:28px}
+.footer{padding:40px 6%;text-align:center;color:rgba(255,255,255,.35);font-size:13px;
+border-top:1px solid rgba(255,255,255,.06)}
+.list-item{display:flex;gap:16px;margin-bottom:20px;align-items:flex-start}
+.list-item .num{width:36px;height:36px;border-radius:50%;background:#a855f7;display:flex;align-items:center;
+justify-content:center;font-weight:700;flex-shrink:0;font-size:14px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:none}}
+.card:nth-child(2){animation-delay:.1s}.card:nth-child(3){animation-delay:.2s}.card:nth-child(4){animation-delay:.3s}
+@media(max-width:800px){
+.nav-links{display:none}
+.split,.img-row{grid-template-columns:1fr}
+.hero{min-height:80vh;padding-top:100px}
+.btn-outline{margin-left:0;margin-top:12px}
+}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="brand">NeonArena</div>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#features">Features</a>
+    <a href="#gallery">Gallery</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+<section class="hero">
+  <div class="hero-content">
+    <span class="hero-kicker">GAMING CAFE</span>
+    <h1>Play. Compete.<br>Dominate.</h1>
+    <p>High-end gaming PCs, consoles and tournament nights — the ultimate arena in your city.</p>
+    <div>
+      <a class="btn" href="#contact">Get Started</a>
+      <a class="btn btn-outline" href="#about">Learn More</a>
+    </div>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="stat"><strong>40+</strong><span>Gaming Rigs</span></div>
+  <div class="stat"><strong>4K</strong><span>Ultra Settings</span></div>
+  <div class="stat"><strong>24/7</strong><span>Open Hours</span></div>
+  <div class="stat"><strong>₹99</strong><span>Starting / Hour</span></div>
+</section>
+<section class="section" id="about">
+  <div class="section-title"><span>ABOUT</span><h2>Welcome to NeonArena</h2>
+  <p>Built for gamers who want zero lag, max FPS and a community that plays hard.</p></div>
+  <div class="split">
+    <div>
+      <h3 style="font-size:24px;margin-bottom:14px">Why gamers choose us</h3>
+      <div class="list-item"><div class="num">1</div><div><strong>RTX 4070 Rigs</strong><p style="color:rgba(255,255,255,.6);font-size:14px">240Hz monitors, mechanical keyboards, pro mice.</p></div></div>
+      <div class="list-item"><div class="num">2</div><div><strong>Console Zone</strong><p style="color:rgba(255,255,255,.6);font-size:14px">PS5 & Xbox Series X with big screens.</p></div></div>
+      <div class="list-item"><div class="num">3</div><div><strong>Tournaments</strong><p style="color:rgba(255,255,255,.6);font-size:14px">Weekly Valorant, BGMI & FIFA cups with prizes.</p></div></div>
+    </div>
+    <img src="img/a.jpg" alt="Gaming setup">
+  </div>
+</section>
+<section class="section" id="features">
+  <div class="section-title"><span>FEATURES</span><h2>What you get</h2></div>
+  <div class="grid">
+    <div class="card"><div class="icon">🎮</div><h3>PC Battlestations</h3><p>High refresh rate, ultra presets, zero compromise.</p></div>
+    <div class="card"><div class="icon">🏆</div><h3>Tournaments</h3><p>Cash prizes, leaderboards and team events every week.</p></div>
+    <div class="card"><div class="icon">🍕</div><h3>Snacks & Drinks</h3><p>Energy drinks, pizza and gamer-friendly menu.</p></div>
+    <div class="card"><div class="icon">💺</div><h3>VIP Booths</h3><p>Private rooms for squads and content creators.</p></div>
+  </div>
+</section>
+<section class="section" id="gallery">
+  <div class="section-title"><span>GALLERY</span><h2>Inside the arena</h2></div>
+  <div class="img-row"><img src="img/hero.jpg" alt="Arena"><img src="img/b.jpg" alt="Setup"></div>
+</section>
+<section class="cta-band" id="contact">
+  <h2>Ready to play?</h2>
+  <p>Book your seat online or walk in — first hour special for new players.</p>
+  <a class="btn" href="#">Book a Seat</a>
+</section>
+
+<footer class="footer">Demo website by Piyush Kumar · Portfolio sample · Not a live business</footer>
+<script>
+const obs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.style.animationPlayState='running'});
+},{threshold:.15});
+document.querySelectorAll('.card,.split,.img-row').forEach(el=>{el.style.animationPlayState='paused';obs.observe(el)});
+</script>
+</body>
+</html>
